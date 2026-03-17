@@ -1,0 +1,138 @@
+{%- style -%}
+  .floating-container {
+    min-height: 120vh; /* Para que haya espacio de sobra para el scroll */
+    background-color: #000;
+    overflow: hidden;
+  }
+  .product-float {
+    transition: transform 0.1s ease-out; /* Suaviza el movimiento */
+    will-change: transform;
+  }
+{%- endstyle -%}
+
+<section class="floating-container relative flex items-center justify-center py-20">
+  {%- comment -%} Texto central fijo {%- endcomment -%}
+  <div class="relative z-10 text-center px-6">
+    <h2 class="text-white text-6xl md:text-[120px] font-black uppercase italic leading-none tracking-tighter">
+      {{ section.settings.title }}
+    </h2>
+    <p class="text-slate-400 text-xl md:text-2xl mt-4 uppercase tracking-widest">
+      {{ section.settings.subtitle }}
+    </p>
+  </div>
+
+  {%- comment -%} Productos flotantes {%- endcomment -%}
+  <div class="absolute inset-0 z-0 pointer-events-none">
+    {%- for block in section.blocks -%}
+      {%- if block.settings.product_image != blank -%}
+        <div
+          class="product-float absolute"
+          data-speed="{{ block.settings.scroll_speed }}"
+          style="
+            top: {{ block.settings.pos_y }}%;
+            left: {{ block.settings.pos_x }}%;
+            width: {{ block.settings.img_width }}px;
+          "
+        >
+          <img
+            src="{{ block.settings.product_image | image_url: width: 800 }}"
+            alt="Producto flotante"
+            class="w-full h-auto drop-shadow-[0_20px_50px_rgba(255,255,255,0.1)]"
+            style="transform: rotate({{ block.settings.rotation }}deg);"
+          >
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
+
+<script>
+  window.addEventListener('scroll', function () {
+    const scrollY = window.pageYOffset;
+    const items = document.querySelectorAll('.product-float');
+
+    items.forEach((item) => {
+      const speed = item.getAttribute('data-speed');
+      // Calculamos el movimiento: a mayor velocidad, más se mueve al hacer scroll
+      const yPos = -((scrollY * speed) / 10);
+      item.style.transform = `translateY(${yPos}px)`;
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Productos Flotantes",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Título Central", "default": "THE COLLECTION" },
+    { "type": "text", "id": "subtitle", "label": "Subtítulo", "default": "EXPLORE THE UNKNOWN" }
+  ],
+  "blocks": [
+    {
+      "type": "product_item",
+      "name": "Producto Flotante",
+      "settings": [
+        { "type": "image_picker", "id": "product_image", "label": "Imagen del Producto" },
+        {
+          "type": "range",
+          "id": "pos_x",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "label": "Posición Horizontal (X)",
+          "default": 10
+        },
+        {
+          "type": "range",
+          "id": "pos_y",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "label": "Posición Vertical (Y)",
+          "default": 20
+        },
+        {
+          "type": "range",
+          "id": "img_width",
+          "min": 100,
+          "max": 600,
+          "step": 50,
+          "unit": "px",
+          "label": "Ancho de Imagen",
+          "default": 300
+        },
+        {
+          "type": "range",
+          "id": "scroll_speed",
+          "min": -5,
+          "max": 5,
+          "step": 1,
+          "label": "Velocidad de Flotado",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "rotation",
+          "min": -180,
+          "max": 180,
+          "step": 5,
+          "label": "Rotación Inicial",
+          "default": 0
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Productos Flotantes",
+      "blocks": [
+        { "type": "product_item", "settings": { "pos_x": 10, "pos_y": 15, "scroll_speed": 2 } },
+        { "type": "product_item", "settings": { "pos_x": 70, "pos_y": 30, "scroll_speed": -2 } },
+        { "type": "product_item", "settings": { "pos_x": 40, "pos_y": 60, "scroll_speed": 4 } }
+      ]
+    }
+  ]
+}
+{% endschema %}
