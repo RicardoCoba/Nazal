@@ -1,0 +1,156 @@
+{%- style -%}
+  .hero-slider-height {
+    height: 70vh; /* Altura ajustable */
+  }
+{%- endstyle -%}
+
+<div class="relative overflow-hidden bg-black hero-slider-height">
+  <div class="flex h-full transition-transform duration-500 ease-in-out" id="HeroSlider">
+    {%- for block in section.blocks -%}
+      <div class="min-w-full h-full relative flex-shrink-0" {{ block.shopify_attributes }}>
+        {%- if block.settings.video_url != blank -%}
+          {%- comment -%} RENDER VIDEO {%- endcomment -%}
+          {{
+            block.settings.video_url
+            | video_tag:
+              autoplay: true,
+              loop: true,
+              muted: true,
+              controls: false,
+              class: 'absolute inset-0 w-full h-full object-cover'
+          }}
+        {%- elsif block.settings.image != blank -%}
+          {%- comment -%} RENDER IMAGE {%- endcomment -%}
+          <img
+            src="{{ block.settings.image | image_url: width: 2000 }}"
+            class="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+            alt="{{ block.settings.image.alt }}"
+          >
+        {%- else -%}
+          {%- comment -%} PLACEHOLDER {%- endcomment -%}
+          <div class="absolute inset-0 bg-slate-800 flex items-center justify-center text-white">
+            Configura una imagen o video
+          </div>
+        {%- endif -%}
+
+        {%- comment -%} Overlay y Texto {%- endcomment -%}
+        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <div class="text-center px-4 max-w-4xl">
+            <h2 class="text-white text-4xl md:text-7xl font-bold uppercase tracking-tighter italic mb-4">
+              {{ block.settings.title }}
+            </h2>
+            <p class="text-slate-200 text-lg md:text-xl mb-8">
+              {{ block.settings.subtext }}
+            </p>
+            {%- if block.settings.button_link != blank -%}
+              <a
+                href="{{ block.settings.button_link }}"
+                class="inline-block bg-white text-black px-8 py-3 font-bold uppercase hover:bg-indigo-500 hover:text-white transition-colors duration-300"
+              >
+                {{ block.settings.button_label }}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  {%- comment -%} Controles (Flechas) con Tailwind {%- endcomment -%}
+  <button
+    onclick="moveSlider(-1)"
+    class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/50 p-3 rounded-full text-white z-10"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="w-6 h-6"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+    </svg>
+  </button>
+  <button
+    onclick="moveSlider(1)"
+    class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/50 p-3 rounded-full text-white z-10"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="1.5"
+      stroke="currentColor"
+      class="w-6 h-6"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+    </svg>
+  </button>
+</div>
+
+<script>
+  let currentSlide = 0;
+  function moveSlider(direction) {
+    const slider = document.getElementById('HeroSlider');
+    const totalSlides = slider.children.length;
+    currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Hero Video Slider",
+  "max_blocks": 3,
+  "settings": [],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide (Imagen o Video)",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen de fondo"
+        },
+        {
+          "type": "video",
+          "id": "video_url",
+          "label": "O selecciona un Video (Shopify Video)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Nueva Colección"
+        },
+        {
+          "type": "text",
+          "id": "subtext",
+          "label": "Subtexto",
+          "default": "Descripción corta de tu marca"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Enlace del botón"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "default": "Ver más"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Video Slider",
+      "blocks": [{ "type": "slide" }, { "type": "slide" }, { "type": "slide" }]
+    }
+  ]
+}
+{% endschema %}
