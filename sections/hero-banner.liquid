@@ -1,15 +1,15 @@
 {%- style -%}
   .hero-slider-height {
-    height: 70vh; /* Altura ajustable */
+    height: 80vh;
   }
 {%- endstyle -%}
 
 <div class="relative overflow-hidden bg-black hero-slider-height">
-  <div class="flex h-full transition-transform duration-500 ease-in-out" id="HeroSlider">
+  <div class="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)]" id="HeroSlider">
     {%- for block in section.blocks -%}
       <div class="min-w-full h-full relative flex-shrink-0" {{ block.shopify_attributes }}>
+        {%- comment -%} MEDIA (Video o Imagen) {%- endcomment -%}
         {%- if block.settings.video_url != blank -%}
-          {%- comment -%} RENDER VIDEO {%- endcomment -%}
           {{
             block.settings.video_url
             | video_tag:
@@ -20,33 +20,30 @@
               class: 'absolute inset-0 w-full h-full object-cover'
           }}
         {%- elsif block.settings.image != blank -%}
-          {%- comment -%} RENDER IMAGE {%- endcomment -%}
           <img
             src="{{ block.settings.image | image_url: width: 2000 }}"
             class="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
             alt="{{ block.settings.image.alt }}"
           >
-        {%- else -%}
-          {%- comment -%} PLACEHOLDER {%- endcomment -%}
-          <div class="absolute inset-0 bg-slate-800 flex items-center justify-center text-white">
-            Configura una imagen o video
-          </div>
         {%- endif -%}
 
-        {%- comment -%} Overlay y Texto {%- endcomment -%}
-        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <div class="text-center px-4 max-w-4xl">
-            <h2 class="text-white text-4xl md:text-7xl font-bold uppercase tracking-tighter italic mb-4">
+        {%- comment -%}
+          CONTENEDOR DE TEXTO DINÁMICO
+          Usamos las clases de alineación que vienen del schema
+        {%- endcomment -%}
+        <div class="absolute inset-0 bg-black/30 flex {{ block.settings.vertical_alignment }} {{ block.settings.horizontal_alignment }} p-8 md:p-20">
+          <div class="{{ block.settings.text_align }} max-w-2xl">
+            <h2 class="text-white text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none mb-4 drop-shadow-lg">
               {{ block.settings.title }}
             </h2>
-            <p class="text-slate-200 text-lg md:text-xl mb-8">
+            <p class="text-white text-lg md:text-2xl font-medium mb-8 drop-shadow-md">
               {{ block.settings.subtext }}
             </p>
             {%- if block.settings.button_link != blank -%}
               <a
                 href="{{ block.settings.button_link }}"
-                class="inline-block bg-white text-black px-8 py-3 font-bold uppercase hover:bg-indigo-500 hover:text-white transition-colors duration-300"
+                class="inline-block bg-white text-black hover:bg-black hover:text-white px-10 py-4 font-bold uppercase tracking-widest transition-all duration-300 transform hover:scale-105"
               >
                 {{ block.settings.button_label }}
               </a>
@@ -57,37 +54,25 @@
     {%- endfor -%}
   </div>
 
-  {%- comment -%} Controles (Flechas) con Tailwind {%- endcomment -%}
-  <button
-    onclick="moveSlider(-1)"
-    class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/50 p-3 rounded-full text-white z-10"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6"
+  {%- comment -%} Flechas de navegación {%- endcomment -%}
+  <div class="absolute bottom-10 right-10 flex gap-4 z-20">
+    <button
+      onclick="moveSlider(-1)"
+      class="border border-white/50 hover:bg-white hover:text-black p-4 text-white transition-all"
     >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-    </svg>
-  </button>
-  <button
-    onclick="moveSlider(1)"
-    class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/50 p-3 rounded-full text-white z-10"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-6 h-6"
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <button
+      onclick="moveSlider(1)"
+      class="border border-white/50 hover:bg-white hover:text-black p-4 text-white transition-all"
     >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-    </svg>
-  </button>
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
 </div>
 
 <script>
@@ -102,55 +87,59 @@
 
 {% schema %}
 {
-  "name": "Hero Video Slider",
+  "name": "Hero Video Slider PRO",
   "max_blocks": 3,
-  "settings": [],
   "blocks": [
     {
       "type": "slide",
-      "name": "Slide (Imagen o Video)",
+      "name": "Slide",
       "settings": [
+        { "type": "image_picker", "id": "image", "label": "Imagen" },
+        { "type": "video", "id": "video_url", "label": "Video" },
+        { "type": "text", "id": "title", "label": "Título", "default": "TITULO IMPACTANTE" },
+        { "type": "text", "id": "subtext", "label": "Subtítulo", "default": "Describe tu marca aquí" },
+        { "type": "url", "id": "button_link", "label": "Link" },
+        { "type": "text", "id": "button_label", "label": "Botón", "default": "COMPRAR" },
         {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Imagen de fondo"
+          "type": "header",
+          "content": "Posicionamiento del Texto"
         },
         {
-          "type": "video",
-          "id": "video_url",
-          "label": "O selecciona un Video (Shopify Video)"
+          "type": "select",
+          "id": "horizontal_alignment",
+          "label": "Alineación Horizontal",
+          "options": [
+            { "value": "justify-start", "label": "Izquierda" },
+            { "value": "justify-center", "label": "Centro" },
+            { "value": "justify-end", "label": "Derecha" }
+          ],
+          "default": "justify-center"
         },
         {
-          "type": "text",
-          "id": "title",
-          "label": "Título",
-          "default": "Nueva Colección"
+          "type": "select",
+          "id": "vertical_alignment",
+          "label": "Alineación Vertical",
+          "options": [
+            { "value": "items-start", "label": "Arriba" },
+            { "value": "items-center", "label": "Centro" },
+            { "value": "items-end", "label": "Abajo" }
+          ],
+          "default": "items-center"
         },
         {
-          "type": "text",
-          "id": "subtext",
-          "label": "Subtexto",
-          "default": "Descripción corta de tu marca"
-        },
-        {
-          "type": "url",
-          "id": "button_link",
-          "label": "Enlace del botón"
-        },
-        {
-          "type": "text",
-          "id": "button_label",
-          "label": "Texto del botón",
-          "default": "Ver más"
+          "type": "select",
+          "id": "text_align",
+          "label": "Alineación del Texto",
+          "options": [
+            { "value": "text-left", "label": "Izquierda" },
+            { "value": "text-center", "label": "Centro" },
+            { "value": "text-right", "label": "Derecha" }
+          ],
+          "default": "text-center"
         }
       ]
     }
   ],
-  "presets": [
-    {
-      "name": "Hero Video Slider",
-      "blocks": [{ "type": "slide" }, { "type": "slide" }, { "type": "slide" }]
-    }
-  ]
+  "presets": [{ "name": "Hero Video Slider PRO" }]
 }
 {% endschema %}
