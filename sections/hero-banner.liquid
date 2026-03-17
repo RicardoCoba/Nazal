@@ -1,14 +1,33 @@
 {%- style -%}
   .hero-slider-height {
-    height: 80vh;
+    height: 85vh;
   }
+  {%- for block in section.blocks -%}
+    .btn-custom-{{ block.id }} {
+      background-color: {{ block.settings.btn_bg_color }};
+      color: {{ block.settings.btn_text_color }};
+      border-radius: {{ block.settings.btn_radius }}px;
+      {% if block.settings.button_style == 'outline' %}
+        background-color: transparent !important;
+        border: 2px solid {{ block.settings.btn_bg_color }};
+        color: {{ block.settings.btn_bg_color }};
+      {% endif %}
+    }
+    .btn-custom-{{ block.id }}:hover {
+      filter: brightness(0.9);
+      {% if block.settings.button_style == 'outline' %}
+        background-color: {{ block.settings.btn_bg_color }} !important;
+        color: {{ block.settings.btn_text_color }} !important;
+      {% endif %}
+    }
+  {%- endfor -%}
 {%- endstyle -%}
 
 <div class="relative overflow-hidden bg-black hero-slider-height">
   <div class="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)]" id="HeroSlider">
     {%- for block in section.blocks -%}
       <div class="min-w-full h-full relative flex-shrink-0" {{ block.shopify_attributes }}>
-        {%- comment -%} MEDIA (Video o Imagen) {%- endcomment -%}
+        {%- comment -%} MEDIA {%- endcomment -%}
         {%- if block.settings.video_url != blank -%}
           {{
             block.settings.video_url
@@ -24,29 +43,28 @@
             src="{{ block.settings.image | image_url: width: 2000 }}"
             class="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
-            alt="{{ block.settings.image.alt }}"
           >
         {%- endif -%}
 
-        {%- comment -%}
-          CONTENEDOR DE TEXTO DINÁMICO
-          Usamos las clases de alineación que vienen del schema
-        {%- endcomment -%}
-        <div class="absolute inset-0 bg-black/30 flex {{ block.settings.vertical_alignment }} {{ block.settings.horizontal_alignment }} p-8 md:p-20">
-          <div class="{{ block.settings.text_align }} max-w-2xl">
-            <h2 class="text-white text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none mb-4 drop-shadow-lg">
+        {%- comment -%} CONTENIDO {%- endcomment -%}
+        <div class="absolute inset-0 bg-black/40 flex {{ block.settings.vertical_alignment }} {{ block.settings.horizontal_alignment }} p-8 md:p-24">
+          <div class="{{ block.settings.text_align }} max-w-3xl">
+            <h2 class="text-white text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
               {{ block.settings.title }}
             </h2>
-            <p class="text-white text-lg md:text-2xl font-medium mb-8 drop-shadow-md">
+            <p class="text-white text-lg md:text-2xl font-light mb-10 drop-shadow-md max-w-xl {% if block.settings.text_align == 'text-center' %}mx-auto{% elsif block.settings.text_align == 'text-right' %}ml-auto{% endif %}">
               {{ block.settings.subtext }}
             </p>
-            {%- if block.settings.button_link != blank -%}
-              <a
-                href="{{ block.settings.button_link }}"
-                class="inline-block bg-white text-black hover:bg-black hover:text-white px-10 py-4 font-bold uppercase tracking-widest transition-all duration-300 transform hover:scale-105"
-              >
-                {{ block.settings.button_label }}
-              </a>
+
+            {%- if block.settings.button_link != blank and block.settings.button_label != blank -%}
+              <div class="flex {% if block.settings.text_align == 'text-center' %}justify-center{% elsif block.settings.text_align == 'text-right' %}justify-end{% endif %}">
+                <a
+                  href="{{ block.settings.button_link }}"
+                  class="btn-custom-{{ block.id }} px-10 py-4 font-bold uppercase tracking-[0.2em] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
+                >
+                  {{ block.settings.button_label }}
+                </a>
+              </div>
             {%- endif -%}
           </div>
         </div>
@@ -54,22 +72,22 @@
     {%- endfor -%}
   </div>
 
-  {%- comment -%} Flechas de navegación {%- endcomment -%}
-  <div class="absolute bottom-10 right-10 flex gap-4 z-20">
+  {%- comment -%} NAVEGACIÓN {%- endcomment -%}
+  <div class="absolute bottom-10 right-10 flex gap-2 z-20">
     <button
       onclick="moveSlider(-1)"
-      class="border border-white/50 hover:bg-white hover:text-black p-4 text-white transition-all"
+      class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M15 19l-7-7 7-7" stroke-width="2"/>
       </svg>
     </button>
     <button
       onclick="moveSlider(1)"
-      class="border border-white/50 hover:bg-white hover:text-black p-4 text-white transition-all"
+      class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M9 5l7 7-7 7" stroke-width="2"/>
       </svg>
     </button>
   </div>
@@ -87,7 +105,7 @@
 
 {% schema %}
 {
-  "name": "Hero Video Slider PRO",
+  "name": "Hero Video Slider Custom",
   "max_blocks": 3,
   "blocks": [
     {
@@ -96,29 +114,49 @@
       "settings": [
         { "type": "image_picker", "id": "image", "label": "Imagen" },
         { "type": "video", "id": "video_url", "label": "Video" },
-        { "type": "text", "id": "title", "label": "Título", "default": "TITULO IMPACTANTE" },
-        { "type": "text", "id": "subtext", "label": "Subtítulo", "default": "Describe tu marca aquí" },
-        { "type": "url", "id": "button_link", "label": "Link" },
-        { "type": "text", "id": "button_label", "label": "Botón", "default": "COMPRAR" },
+        { "type": "text", "id": "title", "label": "Título", "default": "TITULO" },
+        { "type": "text", "id": "subtext", "label": "Subtítulo", "default": "Descripción" },
+        { "type": "header", "content": "Configuración del Botón" },
+        { "type": "text", "id": "button_label", "label": "Texto del Botón", "default": "COMPRAR" },
+        { "type": "url", "id": "button_link", "label": "Enlace" },
+        { "type": "color", "id": "btn_bg_color", "label": "Color de fondo/borde", "default": "#ffffff" },
+        { "type": "color", "id": "btn_text_color", "label": "Color de texto", "default": "#000000" },
         {
-          "type": "header",
-          "content": "Posicionamiento del Texto"
+          "type": "range",
+          "id": "btn_radius",
+          "min": 0,
+          "max": 50,
+          "step": 2,
+          "unit": "px",
+          "label": "Redondeado de esquinas",
+          "default": 0
         },
         {
           "type": "select",
+          "id": "button_style",
+          "label": "Estilo del Botón",
+          "options": [
+            { "value": "solid", "label": "Sólido" },
+            { "value": "outline", "label": "Contorno" }
+          ],
+          "default": "solid"
+        },
+        { "type": "header", "content": "Alineación" },
+        {
+          "type": "select",
           "id": "horizontal_alignment",
-          "label": "Alineación Horizontal",
+          "label": "Horizontal",
           "options": [
             { "value": "justify-start", "label": "Izquierda" },
             { "value": "justify-center", "label": "Centro" },
             { "value": "justify-end", "label": "Derecha" }
           ],
-          "default": "justify-center"
+          "default": "justify-start"
         },
         {
           "type": "select",
           "id": "vertical_alignment",
-          "label": "Alineación Vertical",
+          "label": "Vertical",
           "options": [
             { "value": "items-start", "label": "Arriba" },
             { "value": "items-center", "label": "Centro" },
@@ -129,17 +167,17 @@
         {
           "type": "select",
           "id": "text_align",
-          "label": "Alineación del Texto",
+          "label": "Alineación Texto",
           "options": [
             { "value": "text-left", "label": "Izquierda" },
             { "value": "text-center", "label": "Centro" },
             { "value": "text-right", "label": "Derecha" }
           ],
-          "default": "text-center"
+          "default": "text-left"
         }
       ]
     }
   ],
-  "presets": [{ "name": "Hero Video Slider PRO" }]
+  "presets": [{ "name": "Hero Video Slider Custom" }]
 }
 {% endschema %}
