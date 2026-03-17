@@ -16,9 +16,12 @@
           "type": "slide",
           "settings": {
             "title": "Hola",
-            "subtext": "",
+            "subtext": "Ola",
             "button_link": "",
-            "button_label": ""
+            "button_label": "",
+            "horizontal_alignment": "justify-start",
+            "vertical_alignment": "items-end",
+            "text_align": "text-left"
           }
         }
       },
