@@ -17,8 +17,12 @@
           "settings": {
             "title": "Hola",
             "subtext": "Ola",
-            "button_link": "",
             "button_label": "Hola",
+            "button_link": "",
+            "btn_bg_color": "#ffffff",
+            "btn_text_color": "#000000",
+            "btn_radius": 0,
+            "button_style": "solid",
             "horizontal_alignment": "justify-start",
             "vertical_alignment": "items-end",
             "text_align": "text-left"
@@ -76,6 +80,52 @@
         "stack_images_on_mobile": false,
         "mobile_content_alignment": "center",
         "show_text_below": false
+      }
+    },
+    "floating_section_gUpTqX": {
+      "type": "floating-section",
+      "blocks": {
+        "product_item_7chkkC": {
+          "type": "product_item",
+          "settings": {
+            "product_image": "shopify://shop_images/tiras-nasales-9534bea8d32a3fed1317376824655865-1024-1024.webp",
+            "pos_x": 10,
+            "pos_y": 15,
+            "img_width": 300,
+            "scroll_speed": 2,
+            "rotation": 0
+          }
+        },
+        "product_item_8ADBfd": {
+          "type": "product_item",
+          "settings": {
+            "pos_x": 70,
+            "pos_y": 30,
+            "img_width": 300,
+            "scroll_speed": -2,
+            "rotation": 0
+          }
+        },
+        "product_item_GWGd3Q": {
+          "type": "product_item",
+          "settings": {
+            "pos_x": 40,
+            "pos_y": 60,
+            "img_width": 300,
+            "scroll_speed": 4,
+            "rotation": 0
+          }
+        }
+      },
+      "block_order": [
+        "product_item_7chkkC",
+        "product_item_8ADBfd",
+        "product_item_GWGd3Q"
+      ],
+      "name": "Productos Flotantes",
+      "settings": {
+        "title": "THE COLLECTION",
+        "subtitle": "EXPLORE THE UNKNOWN"
       }
     },
     "rich_text": {
@@ -246,6 +296,7 @@
   "order": [
     "hero_banner_q9jUBG",
     "image_banner",
+    "floating_section_gUpTqX",
     "rich_text",
     "featured_collection",
     "collage",
