@@ -1,5 +1,5 @@
 {%- style -%}
-  /* Contenedor Principal del Header */
+  /* Configuración del Contenedor Principal */
   .custom-header-{{ section.id }} {
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_vertical }}px 0;
@@ -10,7 +10,7 @@
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
-  /* Grid de 3 columnas: Izquierda (Menú), Centro (Logo), Derecha (Menú + Carrito) */
+  /* Grid Principal de 3 Columnas (Izquierda - Centro - Derecha) */
   .header-grid-{{ section.id }} {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -23,7 +23,7 @@
   .nav-group-{{ section.id }} {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: 1fr;
+    grid-auto-columns: 1fr; /* Fuerza a que cada columna mida lo mismo */
     gap: {{ section.settings.gap_links }}px;
     width: 100%;
   }
@@ -36,24 +36,27 @@
     font-style: {{ section.settings.font_style }};
     text-decoration: none;
     white-space: nowrap;
+
+    /* Centrado del texto dentro de su espacio igualitario */
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     transition: all 0.3s ease;
+    padding: 5px 0;
   }
 
   .header-nav-link-{{ section.id }}:hover {
     opacity: 0.5;
   }
 
-  /* Tipografía Dinámica */
+  /* Fuente Personalizada */
   {{ section.settings.font_family | font_face }}
   .font-header-{{ section.id }} {
     font-family: {{ section.settings.font_family.family }}, {{ section.settings.font_family.fallback_families }};
   }
 
-  /* Lado derecho: Agrupa Menú 2 y Carrito */
+  /* Ajuste para el contenedor de la derecha (Menú + Carrito) */
   .right-side-{{ section.id }} {
     display: flex;
     align-items: center;
@@ -61,29 +64,9 @@
     gap: 30px;
   }
 
-  /* Estilo del Icono de Carrito Personalizado (Máscara CSS) */
-  .cart-mask-icon-{{ section.id }} {
-    width: {{ section.settings.cart_size }}px;
-    height: {{ section.settings.cart_size }}px;
-    background-color: {{ section.settings.cart_color }};
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: contain;
-    mask-size: contain;
-    -webkit-mask-position: center;
-    mask-position: center;
-    display: block;
-    transition: transform 0.3s ease;
-  }
-
-  .cart-mask-icon-{{ section.id }}:hover {
-    transform: scale(1.1);
-  }
-
-  /* Ocultar menús en móvil para evitar desbordamiento */
   @media screen and (max-width: 768px) {
     .nav-group-{{ section.id }} {
-      display: none;
+      display: none; /* Oculta menús en móvil para evitar desbordamiento */
     }
   }
 {%- endstyle -%}
@@ -108,7 +91,7 @@
               style="width: {{ section.settings.logo_width }}px; height: auto; display: block;"
             >
           {%- else -%}
-            <span style="color: {{ section.settings.text_color }}; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; font-style: italic;">
+            <span style="color: {{ section.settings.text_color }}; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; font-style: italic; letter-spacing: -1px;">
               {{ shop.name }}
             </span>
           {%- endif -%}
@@ -124,25 +107,16 @@
           {%- endfor -%}
         </nav>
 
-        <a href="{{ routes.cart_url }}" class="relative flex items-center shrink-0" aria-label="Carrito">
-          {%- if section.settings.custom_cart_icon != blank -%}
-            {%- assign icon_url = section.settings.custom_cart_icon | image_url: width: 150 -%}
-            <div
-              class="cart-mask-icon-{{ section.id }}"
-              style="-webkit-mask-image: url({{ icon_url }}); mask-image: url({{ icon_url }});"
-            ></div>
-          {%- else -%}
-            <svg
-              width="{{ section.settings.cart_size }}"
-              height="{{ section.settings.cart_size }}"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="{{ section.settings.cart_color }}"/>
-            </svg>
-          {%- endif -%}
-
+        <a href="{{ routes.cart_url }}" class="relative flex items-center shrink-0">
+          <svg
+            width="{{ section.settings.cart_size }}"
+            height="{{ section.settings.cart_size }}"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="{{ section.settings.cart_color }}"/>
+          </svg>
           {%- if cart.item_count > 0 -%}
             <span style="position: absolute; top: -10px; right: -10px; background: {{ section.settings.cart_color }}; color: {{ section.settings.bg_color }}; font-size: 9px; font-weight: 900; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid {{ section.settings.bg_color }};">
               {{ cart.item_count }}
@@ -158,7 +132,7 @@
 {
   "name": "Custom Split Header Pro",
   "settings": [
-    { "type": "header", "content": "Comportamiento y Estructura" },
+    { "type": "header", "content": "Comportamiento" },
     {
       "type": "select",
       "id": "sticky_header",
@@ -176,7 +150,7 @@
       "max": 250,
       "step": 5,
       "unit": "px",
-      "label": "Altura mínima del Header",
+      "label": "Altura mínima",
       "default": 90
     },
     {
@@ -196,13 +170,13 @@
       "type": "range",
       "id": "logo_width",
       "min": 30,
-      "max": 450,
+      "max": 400,
       "step": 5,
       "unit": "px",
       "label": "Ancho del Logo",
       "default": 130
     },
-    { "type": "header", "content": "Navegación Dinámica" },
+    { "type": "header", "content": "Menús (Divididos)" },
     { "type": "link_list", "id": "menu_left", "label": "Menú Izquierdo" },
     { "type": "link_list", "id": "menu_right", "label": "Menú Derecho" },
     {
@@ -216,8 +190,8 @@
       "default": 20
     },
     { "type": "header", "content": "Estilos de Texto" },
-    { "type": "color", "id": "bg_color", "label": "Color de Fondo", "default": "#000000" },
-    { "type": "color", "id": "text_color", "label": "Color de Letras", "default": "#ffffff" },
+    { "type": "color", "id": "bg_color", "label": "Fondo", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Letras", "default": "#ffffff" },
     { "type": "font_picker", "id": "font_family", "label": "Tipografía", "default": "assistant_n4" },
     {
       "type": "range",
@@ -226,13 +200,13 @@
       "max": 40,
       "step": 1,
       "unit": "px",
-      "label": "Tamaño de Letra",
+      "label": "Tamaño Letra",
       "default": 13
     },
     {
       "type": "select",
       "id": "font_weight",
-      "label": "Grosor (Weight)",
+      "label": "Grosor",
       "options": [
         { "value": "300", "label": "Light" },
         { "value": "400", "label": "Normal" },
@@ -261,33 +235,27 @@
       ],
       "default": "normal"
     },
-    { "type": "header", "content": "Icono del Carrito" },
-    {
-      "type": "image_picker",
-      "id": "custom_cart_icon",
-      "label": "Subir Icono Propio (SVG/PNG)",
-      "info": "Si subes uno, el color de abajo se aplicará automáticamente a la silueta."
-    },
-    { "type": "color", "id": "cart_color", "label": "Color del Icono", "default": "#ffffff" },
+    { "type": "header", "content": "Carrito" },
+    { "type": "color", "id": "cart_color", "label": "Color Icono", "default": "#ffffff" },
     {
       "type": "range",
       "id": "cart_size",
       "min": 10,
-      "max": 100,
+      "max": 60,
       "step": 2,
       "unit": "px",
-      "label": "Tamaño del Icono",
-      "default": 24
+      "label": "Tamaño Icono",
+      "default": 22
     },
-    { "type": "header", "content": "Ajustes de Espacio" },
+    { "type": "header", "content": "Espaciado" },
     {
       "type": "range",
       "id": "padding_vertical",
       "min": 0,
-      "max": 150,
+      "max": 100,
       "step": 5,
       "unit": "px",
-      "label": "Espaciado Superior/Inferior",
+      "label": "Padding Superior/Inferior",
       "default": 25
     }
   ],
