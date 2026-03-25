@@ -10,7 +10,6 @@
     animation: marquee {{ section.settings.speed }}s linear infinite;
   }
 
-  /* Aplicamos los estilos globales de la sección */
   .marquee-text-{{ section.id }} {
     color: {{ section.settings.text_color }};
     font-size: {{ section.settings.font_size_mobile }}px;
@@ -21,6 +20,7 @@
     display: flex;
     align-items: center;
     gap: {{ section.settings.gap }}px;
+    padding-right: {{ section.settings.gap }}px; /* Espacio entre el fin de una vuelta y el inicio de otra */
   }
 
   @media screen and (min-width: 750px) {
@@ -29,7 +29,6 @@
     }
   }
 
-  /* Inyectar la fuente personalizada si se selecciona */
   {{ section.settings.font_family | font_face }}
   .font-custom-{{ section.id }} {
     font-family: {{ section.settings.font_family.family }}, {{ section.settings.font_family.fallback_families }};
@@ -37,30 +36,38 @@
 {%- endstyle -%}
 
 <div
-  class="marquee-container overflow-hidden py-4 border-y border-white/10"
+  class="marquee-container overflow-hidden py-6 border-y border-white/10"
   style="background-color: {{ section.settings.bg_color }};"
 >
   <div class="animate-marquee-{{ section.id }}">
+    {%- comment -%}
+      Capa 1: Repetición para el efecto infinito de CSS (obligatorio 2 veces)
+    {%- endcomment -%}
     {%- for i in (1..2) -%}
-      <div class="flex items-center px-4" style="gap: {{ section.settings.gap }}px;">
-        {%- for block in section.blocks -%}
-          <div
-            class="marquee-text-{{ section.id }} font-custom-{{ section.id }} flex-shrink-0"
-            {{ block.shopify_attributes }}
-          >
-            {%- if block.settings.image != blank -%}
-              <img
-                src="{{ block.settings.image | image_url: width: 200 }}"
-                alt="{{ block.settings.text }}"
-                style="height: {{ section.settings.img_height }}px; w-auto object-contain;"
-                loading="lazy"
-              >
-            {%- endif -%}
-
-            {%- if block.settings.text != blank -%}
-              <span>{{ block.settings.text }}</span>
-            {%- endif -%}
-          </div>
+      <div class="flex items-center">
+        {%- comment -%}
+          Capa 2: Repetición manual definida por el usuario
+        {%- endcomment -%}
+        {%- assign repeat_count = section.settings.repeat_items -%}
+        {%- for j in (1..repeat_count) -%}
+          {%- for block in section.blocks -%}
+            <div
+              class="marquee-text-{{ section.id }} font-custom-{{ section.id }} flex-shrink-0"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.image != blank -%}
+                <img
+                  src="{{ block.settings.image | image_url: width: 200 }}"
+                  alt="{{ block.settings.text }}"
+                  style="height: {{ section.settings.img_height }}px; width: auto; object-contain;"
+                  loading="lazy"
+                >
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <span>{{ block.settings.text }}</span>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
         {%- endfor -%}
       </div>
     {%- endfor -%}
@@ -69,50 +76,62 @@
 
 {% schema %}
 {
-  "name": "Marquee Pro Custom",
+  "name": "Marquee",
   "settings": [
     {
       "type": "header",
-      "content": "Colores y Fondo"
-    },
-    { "type": "color", "id": "bg_color", "label": "Color de Fondo", "default": "#000000" },
-    { "type": "color", "id": "text_color", "label": "Color de Texto", "default": "#ffffff" },
-    {
-      "type": "header",
-      "content": "Tipografía y Estilo"
-    },
-    {
-      "type": "font_picker",
-      "id": "font_family",
-      "label": "Fuente Personalizada",
-      "default": "assistant_n4"
+      "content": "Configuración de Bucle"
     },
     {
       "type": "range",
-      "id": "font_size_desktop",
-      "min": 10,
-      "max": 150,
+      "id": "repeat_items",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "label": "Número de repeticiones de los bloques",
+      "info": "Multiplica tus bloques para llenar el ancho de pantalla y que el loop sea fluido.",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 2,
+      "max": 100,
       "step": 2,
+      "unit": "s",
+      "label": "Velocidad (Segundos)",
+      "default": 20
+    },
+    { "type": "header", "content": "Colores y Fuente" },
+    { "type": "color", "id": "bg_color", "label": "Color de Fondo", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Color de Texto", "default": "#ffffff" },
+    { "type": "font_picker", "id": "font_family", "label": "Fuente", "default": "assistant_n4" },
+    { "type": "header", "content": "Tamaños y Estilo" },
+    {
+      "type": "range",
+      "id": "font_size_desktop",
+      "min": 20,
+      "max": 200,
+      "step": 5,
       "unit": "px",
       "label": "Tamaño Desktop",
-      "default": 40
+      "default": 60
     },
     {
       "type": "range",
       "id": "font_size_mobile",
       "min": 10,
-      "max": 80,
+      "max": 100,
       "step": 2,
       "unit": "px",
       "label": "Tamaño Mobile",
-      "default": 24
+      "default": 30
     },
     {
       "type": "select",
       "id": "font_weight",
-      "label": "Grosor (Weight)",
+      "label": "Grosor",
       "options": [
-        { "value": "300", "label": "Light" },
         { "value": "400", "label": "Normal" },
         { "value": "700", "label": "Bold" },
         { "value": "900", "label": "Black" }
@@ -125,9 +144,7 @@
       "label": "Transformación",
       "options": [
         { "value": "none", "label": "Normal" },
-        { "value": "uppercase", "label": "MAYÚSCULAS" },
-        { "value": "lowercase", "label": "minúsculas" },
-        { "value": "capitalize", "label": "Capitalize" }
+        { "value": "uppercase", "label": "MAYÚSCULAS" }
       ],
       "default": "uppercase"
     },
@@ -142,38 +159,24 @@
       "default": "italic"
     },
     {
-      "type": "header",
-      "content": "Ajustes de Animación e Imágenes"
-    },
-    {
-      "type": "range",
-      "id": "speed",
-      "min": 2,
-      "max": 60,
-      "step": 1,
-      "unit": "s",
-      "label": "Velocidad",
-      "default": 15
-    },
-    {
       "type": "range",
       "id": "gap",
       "min": 10,
       "max": 200,
       "step": 10,
       "unit": "px",
-      "label": "Espacio entre elementos",
-      "default": 60
+      "label": "Espacio (Gap)",
+      "default": 80
     },
     {
       "type": "range",
       "id": "img_height",
-      "min": 10,
-      "max": 150,
-      "step": 5,
+      "min": 20,
+      "max": 200,
+      "step": 10,
       "unit": "px",
-      "label": "Altura de Imágenes",
-      "default": 40
+      "label": "Altura Iconos",
+      "default": 50
     }
   ],
   "blocks": [
@@ -181,11 +184,11 @@
       "type": "item",
       "name": "Elemento",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Icono/Imagen" },
+        { "type": "image_picker", "id": "image", "label": "Imagen/Icono" },
         { "type": "text", "id": "text", "label": "Texto", "default": "NUEVO DROP" }
       ]
     }
   ],
-  "presets": [{ "name": "Marquee Pro Custom" }]
+  "presets": [{ "name": "Marquee Auto-Repeat" }]
 }
 {% endschema %}
