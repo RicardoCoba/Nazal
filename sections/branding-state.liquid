@@ -4,8 +4,8 @@
     padding: {{ section.settings.padding_v }}px 0;
     text-align: center;
     overflow: visible;
-    /* Perspectiva para profundidad 3D */
-    perspective: 1000px;
+    /* Perspectiva agresiva para el efecto 3D */
+    perspective: 500px;
   }
 
   .brand-header-{{ section.id }} {
@@ -28,31 +28,14 @@
     line-height: 1.2;
   }
 
-  /* --- ANIMACIÓN DE BALANCEO 3D CONSTANTE --- */
-  @keyframes orbit3D-{{ section.id }} {
-    0% {
-      transform: translate(-50%, -50%) translateZ(60px) rotateX(0deg) rotateY(-18deg);
-    }
-    25% {
-      transform: translate(-50%, -53%) translateZ(100px) rotateX(12deg) rotateY(0deg);
-    }
-    50% {
-      transform: translate(-50%, -50%) translateZ(60px) rotateX(0deg) rotateY(18deg);
-    }
-    75% {
-      transform: translate(-50%, -47%) translateZ(100px) rotateX(-12deg) rotateY(0deg);
-    }
-    100% {
-      transform: translate(-50%, -50%) translateZ(60px) rotateX(0deg) rotateY(-18deg);
-    }
-  }
-
+  /* --- SISTEMA RELOJ --- */
   .circle-wrapper-{{ section.id }} {
     display: flex;
     justify-content: center;
     margin-top: {{ section.settings.circle_margin_top }}px;
     padding: 150px 0;
     position: relative;
+    /* Necesario para movimiento en eje Z */
     transform-style: preserve-3d;
   }
 
@@ -63,20 +46,20 @@
     border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
     border-radius: 50%;
     background-color: {{ section.settings.circle_bg_color }};
-    transform-style: preserve-3d;
   }
 
-  /* IMAGEN CENTRAL: MOVIMIENTO PROPIO Y FLUIDO */
+  /* IMAGEN CENTRAL 3D - SIN SOMBRAS */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
     left: 50%;
+    /* translateZ la saca del plano del círculo */
+    transform: translate(-50%, -50%) translateZ(80px);
     width: {{ section.settings.inner_image_width }}%;
     z-index: 5;
     pointer-events: none;
+    transition: transform 0.1s ease-out;
     transform-style: preserve-3d;
-    /* 5 segundos para que se note el vaivén sin pausas */
-    animation: orbit3D-{{ section.id }} 5s ease-in-out infinite;
     will-change: transform;
   }
 
@@ -84,10 +67,11 @@
     width: 100%;
     height: auto;
     display: block;
-    filter: none !important; /* Sin sombras */
+    /* ELIMINADA LA SOMBRA PROYECTADA */
+    filter: none !important;
   }
 
-  /* BLOQUES DE TEXTO (ESTÁTICOS) */
+  /* NODOS ESTÁTICOS */
   .clock-node-{{ section.id }} {
     position: absolute;
     width: 0;
@@ -127,7 +111,7 @@
     display: block;
   }
 
-  /* Coordenadas Horarias */
+  /* Coordenadas */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -164,7 +148,7 @@
 
     <div class="circle-wrapper-{{ section.id }}">
       <div class="circle-container-{{ section.id }}">
-        <div class="center-image-{{ section.id }}">
+        <div class="center-image-{{ section.id }}" id="Tilt-Image-{{ section.id }}">
           {%- if section.settings.circle_image != blank -%}
             <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Product">
           {%- endif -%}
@@ -192,6 +176,40 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('Section-{{ section.id }}');
+    const image = document.getElementById('Tilt-Image-{{ section.id }}');
+    if (!container || !image) return;
+
+    container.addEventListener('mousemove', (e) => {
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      // Aumentamos la potencia a 45 para que se incline MUCHO más
+      const rotateX = ((y - centerY) / centerY) * -45;
+      const rotateY = ((x - centerX) / centerX) * 45;
+
+      // Mantenemos los otros elementos quietos, solo transformamos "image"
+      // ELIMINADO EL FILTRO DE SOMBRA DINÁMICA
+      image.style.transform = `translate(-50%, -50%) translateZ(100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.1)`;
+    });
+
+    container.addEventListener('mouseleave', () => {
+      image.style.transition = 'transform 0.5s ease-out';
+      // Volver a la posición central original
+      image.style.transform = `translate(-50%, -50%) translateZ(80px) rotateX(0deg) rotateY(0deg) scale(1)`;
+      setTimeout(() => {
+        image.style.transition = 'transform 0.1s ease-out';
+      }, 500);
+    });
+  });
+</script>
 
 {% schema %}
 {
