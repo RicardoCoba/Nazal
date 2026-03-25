@@ -75,10 +75,31 @@
         "padding_top": 20,
         "padding_bottom": 20
       }
+    },
+    "custom_header_HKJkdh": {
+      "type": "custom-header",
+      "name": "Custom Split Header",
+      "settings": {
+        "logo": "shopify://shop_images/logo_blanco_1.png",
+        "logo_width": 100,
+        "menu_left": "",
+        "menu_right": "",
+        "bg_color": "#000000",
+        "text_color": "#ffffff",
+        "font_family": "assistant_n4",
+        "font_size": 14,
+        "font_weight": "700",
+        "text_transform": "uppercase",
+        "font_style": "normal",
+        "cart_color": "#ffffff",
+        "cart_size": 24,
+        "padding_vertical": 20
+      }
     }
   },
   "order": [
     "marquee_section_yDpfgP",
-    "header"
+    "header",
+    "custom_header_HKJkdh"
   ]
 }
