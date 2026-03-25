@@ -1,0 +1,111 @@
+{%- style -%}
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee {{ section.settings.speed }}s linear infinite;
+  }
+
+  .marquee-container:hover .animate-marquee {
+    animation-play-state: {% if section.settings.pause_on_hover %}paused{% else %}running{% endif %};
+  }
+{%- endstyle -%}
+
+<div
+  class="marquee-container overflow-hidden border-y border-white/10 py-4"
+  style="background-color: {{ section.settings.bg_color }};"
+>
+  <div class="animate-marquee">
+    {%- comment -%} Repetimos el bucle dos veces para el efecto infinito {%- endcomment -%}
+    {%- for i in (1..2) -%}
+      <div class="flex items-center gap-12 px-6">
+        {%- for block in section.blocks -%}
+          <div class="flex items-center gap-4 flex-shrink-0" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              <img
+                src="{{ block.settings.image | image_url: width: 100 }}"
+                alt="{{ block.settings.text }}"
+                class="h-8 md:h-12 w-auto object-contain"
+                loading="lazy"
+              >
+            {%- endif -%}
+
+            {%- if block.settings.text != blank -%}
+              <span
+                class="text-white text-xl md:text-3xl font-black uppercase italic tracking-tighter"
+                style="color: {{ section.settings.text_color }};"
+              >
+                {{ block.settings.text }}
+              </span>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Marquee Infinito",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de Fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color de Texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "s",
+      "label": "Velocidad (Segundos)",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pausar al pasar el mouse",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Elemento de cintilla",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen / Icono"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "NUEVO LANZAMIENTO"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee Infinito",
+      "blocks": [{ "type": "item" }, { "type": "item" }, { "type": "item" }]
+    }
+  ]
+}
+{% endschema %}
