@@ -15,17 +15,18 @@
         "slide_Vw3zeC": {
           "type": "slide",
           "settings": {
-            "title": "Hola",
-            "subtext": "Ola",
-            "button_label": "Hola",
+            "video_url": "shopify://files/videos/nazal-web.mp4",
+            "title": "",
+            "subtext": "",
+            "button_label": "",
             "button_link": "",
             "btn_bg_color": "#ffffff",
             "btn_text_color": "#000000",
             "btn_radius": 0,
             "button_style": "solid",
-            "horizontal_alignment": "justify-start",
-            "vertical_alignment": "items-end",
-            "text_align": "text-left"
+            "horizontal_alignment": "justify-center",
+            "vertical_alignment": "items-center",
+            "text_align": "text-center"
           }
         }
       },
