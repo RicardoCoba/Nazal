@@ -16,9 +16,9 @@
           "type": "slide",
           "settings": {
             "video_url": "shopify://files/videos/nazal-web.mp4",
-            "title": "CONTROLA TU RESPIRACIÓN",
+            "title": "",
             "subtext": "",
-            "button_label": "COMPRAR",
+            "button_label": "",
             "button_link": "",
             "btn_bg_color": "#ffffff",
             "btn_text_color": "#000000",
@@ -36,7 +36,7 @@
       "name": "Hero Video Slider",
       "settings": {
         "height_mode": "custom",
-        "custom_height": 650,
+        "custom_height": 700,
         "mobile_height": 500
       }
     },
@@ -140,7 +140,6 @@
         "node_font_family": "assistant_n4",
         "node_font_size": 24,
         "node_font_weight": "700",
-        "node_text_transform": "uppercase",
         "node_content_width": 250,
         "node_icon_width": 50
       }
