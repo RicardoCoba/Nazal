@@ -1,7 +1,25 @@
 {%- style -%}
-  .hero-slider-height {
-    height: 85vh;
+  /* Lógica de altura dinámica */
+  .hero-slider-{{ section.id }} {
+    {% if section.settings.height_mode == 'full' %}
+      height: 100vh;
+    {% elsif section.settings.height_mode == 'custom' %}
+      height: {{ section.settings.custom_height }}px;
+    {% else %}
+      /* Proporción basada en la primera imagen (Adapt) */
+      aspect-ratio: {{ section.blocks.first.settings.image.aspect_ratio | default: '16/9' }};
+      height: auto;
+    {% endif %}
   }
+
+  /* Ajuste para móviles para que no se vea minúsculo si es custom */
+  @media screen and (max-width: 768px) {
+    .hero-slider-{{ section.id }} {
+      height: {{ section.settings.mobile_height }}px;
+      aspect-ratio: auto;
+    }
+  }
+
   {%- for block in section.blocks -%}
     .btn-custom-{{ block.id }} {
       background-color: {{ block.settings.btn_bg_color }};
@@ -23,11 +41,13 @@
   {%- endfor -%}
 {%- endstyle -%}
 
-<div class="relative overflow-hidden bg-black hero-slider-height">
-  <div class="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)]" id="HeroSlider">
+<div class="relative overflow-hidden bg-black hero-slider-{{ section.id }}">
+  <div
+    class="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)]"
+    id="HeroSlider-{{ section.id }}"
+  >
     {%- for block in section.blocks -%}
       <div class="min-w-full h-full relative flex-shrink-0" {{ block.shopify_attributes }}>
-        {%- comment -%} MEDIA {%- endcomment -%}
         {%- if block.settings.video_url != blank -%}
           {{
             block.settings.video_url
@@ -46,7 +66,6 @@
           >
         {%- endif -%}
 
-        {%- comment -%} CONTENIDO {%- endcomment -%}
         <div class="absolute inset-0 bg-black/40 flex {{ block.settings.vertical_alignment }} {{ block.settings.horizontal_alignment }} p-8 md:p-24">
           <div class="{{ block.settings.text_align }} max-w-3xl">
             <h2 class="text-white text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
@@ -75,7 +94,7 @@
   {%- comment -%} NAVEGACIÓN {%- endcomment -%}
   <div class="absolute bottom-10 right-10 flex gap-2 z-20">
     <button
-      onclick="moveSlider(-1)"
+      onclick="moveHeroSlider(-1)"
       class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +102,7 @@
       </svg>
     </button>
     <button
-      onclick="moveSlider(1)"
+      onclick="moveHeroSlider(1)"
       class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,19 +113,56 @@
 </div>
 
 <script>
-  let currentSlide = 0;
-  function moveSlider(direction) {
-    const slider = document.getElementById('HeroSlider');
+  let currentHeroSlide = 0;
+  function moveHeroSlider(direction) {
+    const slider = document.getElementById('HeroSlider-{{ section.id }}');
     const totalSlides = slider.children.length;
-    currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
-    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+    currentHeroSlide = (currentHeroSlide + direction + totalSlides) % totalSlides;
+    slider.style.transform = `translateX(-${currentHeroSlide * 100}%)`;
   }
 </script>
 
 {% schema %}
 {
   "name": "Hero Video Slider Custom",
-  "max_blocks": 3,
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Ajustes de Altura"
+    },
+    {
+      "type": "select",
+      "id": "height_mode",
+      "label": "Modo de Altura",
+      "options": [
+        { "value": "full", "label": "Pantalla Completa (100vh)" },
+        { "value": "adapt", "label": "Adaptar a la primera imagen" },
+        { "value": "custom", "label": "Altura Personalizada (Desktop)" }
+      ],
+      "default": "custom"
+    },
+    {
+      "type": "range",
+      "id": "custom_height",
+      "min": 400,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "label": "Altura en Desktop",
+      "default": 700
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 300,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "label": "Altura en Móvil",
+      "default": 500
+    }
+  ],
   "blocks": [
     {
       "type": "slide",
@@ -116,11 +172,11 @@
         { "type": "video", "id": "video_url", "label": "Video" },
         { "type": "text", "id": "title", "label": "Título", "default": "TITULO" },
         { "type": "text", "id": "subtext", "label": "Subtítulo", "default": "Descripción" },
-        { "type": "header", "content": "Configuración del Botón" },
-        { "type": "text", "id": "button_label", "label": "Texto del Botón", "default": "COMPRAR" },
+        { "type": "header", "content": "Botón" },
+        { "type": "text", "id": "button_label", "label": "Texto", "default": "COMPRAR" },
         { "type": "url", "id": "button_link", "label": "Enlace" },
-        { "type": "color", "id": "btn_bg_color", "label": "Color de fondo/borde", "default": "#ffffff" },
-        { "type": "color", "id": "btn_text_color", "label": "Color de texto", "default": "#000000" },
+        { "type": "color", "id": "btn_bg_color", "label": "Fondo/Borde", "default": "#ffffff" },
+        { "type": "color", "id": "btn_text_color", "label": "Texto", "default": "#000000" },
         {
           "type": "range",
           "id": "btn_radius",
@@ -128,13 +184,13 @@
           "max": 50,
           "step": 2,
           "unit": "px",
-          "label": "Redondeado de esquinas",
+          "label": "Redondeado",
           "default": 0
         },
         {
           "type": "select",
           "id": "button_style",
-          "label": "Estilo del Botón",
+          "label": "Estilo",
           "options": [
             { "value": "solid", "label": "Sólido" },
             { "value": "outline", "label": "Contorno" }
