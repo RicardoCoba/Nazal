@@ -80,20 +80,23 @@
       "type": "custom-header",
       "name": "Custom Split Header",
       "settings": {
+        "sticky_header": "sticky",
+        "header_min_height": 80,
+        "vertical_alignment": "center",
         "logo": "shopify://shop_images/logo_blanco_1.png",
         "logo_width": 200,
         "menu_left": "menu-izquierdo",
         "menu_right": "menu-derecho",
+        "gap_links": 30,
         "bg_color": "#000000",
         "text_color": "#ffffff",
         "font_family": "assistant_n4",
         "font_size": 26,
         "font_weight": "700",
         "text_transform": "none",
-        "font_style": "normal",
         "cart_color": "#ffffff",
         "cart_size": 24,
-        "padding_vertical": 50
+        "padding_vertical": 0
       }
     }
   },
