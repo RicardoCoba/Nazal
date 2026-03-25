@@ -3,7 +3,7 @@
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_v }}px 0;
     text-align: {{ section.settings.horizontal_alignment }};
-    overflow: visible; /* Cambiado a visible para que los textos del reloj no se corten */
+    overflow: visible;
   }
 
   .brand-logo-wrapper-{{ section.id }} {
@@ -33,14 +33,10 @@
     {% endif %}
   }
 
-  .brand-text-{{ section.id }} strong {
-    font-weight: 900;
-  }
-
-  /* --- LÓGICA DEL SISTEMA DE RELOJ --- */
+  /* --- SISTEMA AUTOMÁTICO DE RELOJ --- */
   .circle-container-{{ section.id }} {
     position: relative;
-    display: inline-block; /* Importante para que los puntos orbiten correctamente */
+    display: inline-block;
     margin-top: {{ section.settings.circle_margin_top }}px;
     width: {{ section.settings.circle_size }}px;
     height: {{ section.settings.circle_size }}px;
@@ -66,25 +62,27 @@
     object-fit: contain;
   }
 
-  /* Puntos del Reloj */
+  /* El punto pequeño automático */
   .clock-node-{{ section.id }} {
     position: absolute;
     z-index: 10;
     transform: translate(-50%, -50%);
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
   }
 
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px;
     height: {{ section.settings.dot_size }}px;
     background-color: {{ section.settings.dot_color }};
+    border: 1px solid {{ section.settings.circle_border_color }};
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    flex-shrink: 0;
   }
 
   .node-dot-{{ section.id }} img {
@@ -95,16 +93,16 @@
 
   .node-text-{{ section.id }} {
     position: absolute;
-    width: 150px; /* Ancho para evitar que el texto se rompa feo */
+    width: 200px;
     color: {{ section.settings.node_text_color }};
     font-size: {{ section.settings.node_font_size }}px;
     font-weight: {{ section.settings.node_font_weight }};
     text-transform: {{ section.settings.node_text_transform }};
     font-style: {{ section.settings.node_font_style }};
-    line-height: 1;
+    line-height: 1.1;
   }
 
-  /* Coordenadas tipo Reloj */
+  /* Posiciones Automáticas */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -112,26 +110,23 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
-  /* Ajuste de dirección del texto según la hora */
-  .pos-12 .node-text-{{ section.id }} { bottom: 120%; text-align: center; }
-  .pos-2 .node-text-{{ section.id }}  { left: 120%; text-align: left; }
-  .pos-4 .node-text-{{ section.id }}  { left: 120%; text-align: left; }
-  .pos-6 .node-text-{{ section.id }}  { top: 120%; text-align: center; }
-  .pos-8 .node-text-{{ section.id }}  { right: 120%; text-align: right; }
-  .pos-10 .node-text-{{ section.id }} { right: 120%; text-align: right; }
+  /* Alineación del texto automática según posición */
+  .pos-12 .node-text-{{ section.id }} { bottom: 130%; text-align: center; }
+  .pos-2 .node-text-{{ section.id }}  { left: 130%; text-align: left; }
+  .pos-4 .node-text-{{ section.id }}  { left: 130%; text-align: left; }
+  .pos-6 .node-text-{{ section.id }}  { top: 130%; text-align: center; }
+  .pos-8 .node-text-{{ section.id }}  { right: 130%; text-align: right; }
+  .pos-10 .node-text-{{ section.id }} { right: 130%; text-align: right; }
 
-  /* Tipografía */
-  {{ section.settings.font_family | font_face }}
   {{ section.settings.node_font_family | font_face }}
-  .font-custom-{{ section.id }} { font-family: {{ section.settings.font_family.family }}, sans-serif; }
   .font-node-{{ section.id }} { font-family: {{ section.settings.node_font_family.family }}, sans-serif; }
 
   @media screen and (max-width: 768px) {
     .circle-container-{{ section.id }} {
-      width: min({{ section.settings.circle_size }}px, 70vw);
-      height: min({{ section.settings.circle_size }}px, 70vw);
+      width: min({{ section.settings.circle_size }}px, 60vw);
+      height: min({{ section.settings.circle_size }}px, 60vw);
     }
-    .node-text-{{ section.id }} { width: 80px; font-size: 10px; }
+    .node-text-{{ section.id }} { width: 90px; font-size: 11px; }
   }
 {%- endstyle -%}
 
@@ -139,12 +134,7 @@
   <div class="container mx-auto px-6">
     {%- if section.settings.logo != blank -%}
       <div class="brand-logo-wrapper-{{ section.id }}">
-        <img
-          src="{{ section.settings.logo | image_url: width: 1000 }}"
-          class="brand-logo-{{ section.id }}"
-          alt="Logo"
-          loading="lazy"
-        >
+        <img src="{{ section.settings.logo | image_url: width: 1000 }}" class="brand-logo-{{ section.id }}" alt="Logo">
       </div>
     {%- endif -%}
 
@@ -158,7 +148,7 @@
       <div class="circle-container-{{ section.id }}">
         <div class="brand-circle-{{ section.id }}">
           {%- if section.settings.circle_image != blank -%}
-            <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Circle Image" loading="lazy">
+            <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Center">
           {%- endif -%}
         </div>
 
@@ -169,12 +159,13 @@
           >
             <div class="node-dot-{{ section.id }}">
               {%- if block.settings.node_image != blank -%}
-                <img src="{{ block.settings.node_image | image_url: width: 200 }}" alt="Icon" loading="lazy">
+                <img src="{{ block.settings.node_image | image_url: width: 200 }}" alt="Icon">
               {%- endif -%}
             </div>
+
             {%- if block.settings.node_text != blank -%}
               <div class="node-text-{{ section.id }}">
-                {{ block.settings.node_text }}
+                {{ block.settings.node_text | newline_to_br }}
               </div>
             {%- endif -%}
           </div>
@@ -302,7 +293,7 @@
       "step": 10,
       "unit": "px",
       "label": "Tamaño Círculo",
-      "default": 300
+      "default": 400
     },
     {
       "type": "range",
@@ -323,8 +314,8 @@
       "max": 300,
       "step": 10,
       "unit": "px",
-      "label": "Margen arriba",
-      "default": 60
+      "label": "Margen arriba círculo",
+      "default": 80
     },
     { "type": "image_picker", "id": "circle_image", "label": "Imagen interna" },
     {
@@ -338,29 +329,29 @@
       "default": 70
     },
 
-    { "type": "header", "content": "Ajustes de Puntos del Reloj" },
-    { "type": "color", "id": "dot_color", "label": "Color de los Puntos", "default": "#000000" },
+    { "type": "header", "content": "Estilo de los Puntos Horarios" },
+    { "type": "color", "id": "dot_color", "label": "Color del Punto", "default": "#000000" },
     {
       "type": "range",
       "id": "dot_size",
-      "min": 10,
-      "max": 100,
+      "min": 5,
+      "max": 120,
       "step": 5,
       "unit": "px",
-      "label": "Tamaño de los Puntos",
+      "label": "Tamaño del Punto",
       "default": 20
     },
     { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
-    { "type": "font_picker", "id": "node_font_family", "label": "Fuente Puntos", "default": "assistant_n4" },
+    { "type": "font_picker", "id": "node_font_family", "label": "Fuente Texto", "default": "assistant_n4" },
     {
       "type": "range",
       "id": "node_font_size",
       "min": 8,
-      "max": 50,
+      "max": 60,
       "step": 1,
       "unit": "px",
       "label": "Tamaño Texto",
-      "default": 14
+      "default": 16
     },
     {
       "type": "select",
@@ -369,7 +360,8 @@
       "options": [
         { "value": "300", "label": "Light" },
         { "value": "400", "label": "Normal" },
-        { "value": "700", "label": "Bold" }
+        { "value": "700", "label": "Bold" },
+        { "value": "900", "label": "Black" }
       ],
       "default": "400"
     },
@@ -402,19 +394,19 @@
         {
           "type": "select",
           "id": "position",
-          "label": "Posición (Reloj)",
+          "label": "Seleccionar Hora",
           "options": [
-            { "value": "12", "label": "12:00" },
+            { "value": "12", "label": "12:00 (Arriba)" },
             { "value": "2", "label": "02:00" },
             { "value": "4", "label": "04:00" },
-            { "value": "6", "label": "06:00" },
+            { "value": "6", "label": "06:00 (Abajo)" },
             { "value": "8", "label": "08:00" },
             { "value": "10", "label": "10:00" }
           ],
           "default": "12"
         },
-        { "type": "textarea", "id": "node_text", "label": "Texto del punto" },
-        { "type": "image_picker", "id": "node_image", "label": "Imagen del punto (opcional)" }
+        { "type": "textarea", "id": "node_text", "label": "Texto del Punto" },
+        { "type": "image_picker", "id": "node_image", "label": "Imagen dentro del punto" }
       ]
     }
   ],
