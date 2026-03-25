@@ -6,7 +6,6 @@
     overflow: visible;
   }
 
-  /* Cabecera: Logo y Texto superior */
   .brand-header-{{ section.id }} {
     max-width: {{ section.settings.content_max_width }}px;
     margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
@@ -24,19 +23,17 @@
     font-size: {{ section.settings.font_size }}px;
     font-weight: {{ section.settings.font_weight }};
     text-transform: {{ section.settings.text_transform }};
-    font-style: {{ section.settings.font_style }};
     line-height: 1.2;
   }
 
-  /* --- SISTEMA RELOJ CORREGIDO --- */
   .circle-wrapper-{{ section.id }} {
     display: flex;
     justify-content: center;
     margin-top: {{ section.settings.circle_margin_top }}px;
-    padding: 150px 0; /* Espacio para el contenido exterior */
+    padding: 150px 0;
+    position: relative;
   }
 
-  /* Círculo de Producto (Gris/Línea) */
   .circle-container-{{ section.id }} {
     position: relative;
     width: {{ section.settings.circle_size }}px;
@@ -46,7 +43,6 @@
     background-color: {{ section.settings.circle_bg_color }};
   }
 
-  /* Imagen de Producto Centro */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
@@ -63,27 +59,39 @@
     display: block;
   }
 
-  /* Nodos Horarios */
   .clock-node-{{ section.id }} {
     position: absolute;
-    width: 0;
-    height: 0;
+    width: 1px;
+    height: 1px;
     z-index: 10;
   }
 
-  /* --- EL CÍRCULO DECORATIVO QUE NO SALÍA --- */
+  /* --- EL PUNTO: Ahora usa una imagen subida por ti --- */
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px;
     height: {{ section.settings.dot_size }}px;
-    background-color: {{ section.settings.dot_color }};
-    border: 1px solid {{ section.settings.circle_border_color }}; /* Un pequeño borde para definirlo */
-    border-radius: 50%;
     position: absolute;
     transform: translate(-50%, -50%);
     z-index: 20;
+    display: block !important;
   }
 
-  /* Contenedor de Contenido (Texto e Icono) */
+  .node-dot-{{ section.id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  /* Si no hay imagen, un fallback para que no desaparezca */
+  .node-dot-fallback-{{ section.id }} {
+    width: 100%;
+    height: 100%;
+    background-color: {{ section.settings.dot_color }};
+    border-radius: 50%;
+    display: block;
+  }
+
   .node-content-{{ section.id }} {
     position: absolute;
     display: flex;
@@ -99,9 +107,7 @@
     font-size: {{ section.settings.node_font_size }}px;
     font-weight: {{ section.settings.node_font_weight }};
     text-transform: {{ section.settings.node_text_transform }};
-    font-style: {{ section.settings.node_font_style }};
     line-height: 1.1;
-    width: 100%;
   }
 
   .node-icon-{{ section.id }} img {
@@ -110,7 +116,7 @@
     display: block;
   }
 
-  /* Coordenadas Horarias */
+  /* Posiciones */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -118,22 +124,16 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
-  /* Separación radial externa */
   {%- assign dist = section.settings.node_distance -%}
-
   .pos-12 .node-content-{{ section.id }} { bottom: {{ dist }}px; left: 50%; transform: translateX(-50%); }
-  .pos-2 .node-content-{{ section.id }}  { left: {{ dist }}px; top: 0; transform: translateY(-50%); }
-  .pos-4 .node-content-{{ section.id }}  { left: {{ dist }}px; bottom: 0; transform: translateY(50%); }
-  .pos-6 .node-content-{{ section.id }}  { top: {{ dist }}px; left: 50%; transform: translateX(-50%); }
-  .pos-8 .node-content-{{ section.id }}  { right: {{ dist }}px; bottom: 0; transform: translateY(50%); }
-  .pos-10 .node-content-{{ section.id }} { right: {{ dist }}px; top: 0; transform: translateY(-50%); }
-
-  {{ section.settings.font_family | font_face }}
-  {{ section.settings.node_font_family | font_face }}
+  .pos-2  .node-content-{{ section.id }} { left: {{ dist }}px; top: 0; transform: translateY(-50%); }
+  .pos-4  .node-content-{{ section.id }} { left: {{ dist }}px; bottom: 0; transform: translateY(50%); }
+  .pos-6  .node-content-{{ section.id }} { top: {{ dist }}px; left: 50%; transform: translateX(-50%); }
+  .pos-8  .node-content-{{ section.id }} { right: {{ dist }}px; bottom: 0; transform: translateY(50%); }
+  .pos-10 .node-content-{{ section.id }} { right: {{ gap }}px; top: 0; transform: translateY(-50%); }
 
   @media screen and (max-width: 768px) {
     .circle-wrapper-{{ section.id }} { transform: scale(0.6); padding: 40px 0; }
-    .node-content-{{ section.id }} { width: 100px !important; }
   }
 {%- endstyle -%}
 
@@ -147,9 +147,7 @@
         <img src="{{ section.settings.logo | image_url: width: 600 }}" class="brand-logo-{{ section.id }}" alt="Logo">
       {%- endif -%}
       {%- if section.settings.content != blank -%}
-        <div class="brand-text-{{ section.id }}">
-          {{ section.settings.content }}
-        </div>
+        <div class="brand-text-{{ section.id }}">{{ section.settings.content }}</div>
       {%- endif -%}
     </div>
 
@@ -157,24 +155,27 @@
       <div class="circle-container-{{ section.id }}">
         <div class="center-image-{{ section.id }}">
           {%- if section.settings.circle_image != blank -%}
-            <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Center Product">
+            <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Product">
           {%- endif -%}
         </div>
 
         {%- for block in section.blocks -%}
           <div class="clock-node-{{ section.id }} pos-{{ block.settings.position }}" {{ block.shopify_attributes }}>
-            <div class="node-dot-{{ section.id }}"></div>
+            <div class="node-dot-{{ section.id }}">
+              {%- if block.settings.dot_image != blank -%}
+                <img src="{{ block.settings.dot_image | image_url: width: 100 }}" alt="Dot Icon">
+              {%- else -%}
+                <div class="node-dot-fallback-{{ section.id }}"></div>
+              {%- endif -%}
+            </div>
 
             <div
               class="node-content-{{ section.id }}"
               style="font-family: {{ section.settings.node_font_family.family }}, sans-serif;"
             >
               {%- if block.settings.node_text != blank -%}
-                <div class="node-text-{{ section.id }}">
-                  {{ block.settings.node_text | escape }}
-                </div>
+                <div class="node-text-{{ section.id }}">{{ block.settings.node_text | escape }}</div>
               {%- endif -%}
-
               {%- if block.settings.node_image != blank -%}
                 <div class="node-icon-{{ section.id }}">
                   <img src="{{ block.settings.node_image | image_url: width: 300 }}" alt="Icon">
@@ -204,7 +205,6 @@
       "label": "Padding Vertical",
       "default": 100
     },
-
     { "type": "header", "content": "Logo y Texto Superior" },
     { "type": "image_picker", "id": "logo", "label": "Logo" },
     {
@@ -250,7 +250,6 @@
       "label": "Margen abajo cabecera",
       "default": 60
     },
-
     { "type": "header", "content": "Círculo de Producto" },
     { "type": "image_picker", "id": "circle_image", "label": "Imagen del Producto (Centro)" },
     {
@@ -295,7 +294,6 @@
       "label": "Margen Superior",
       "default": 40
     },
-
     { "type": "header", "content": "Estilo de los Beneficios (Bloques)" },
     {
       "type": "range",
@@ -310,23 +308,23 @@
     {
       "type": "select",
       "id": "content_block_align",
-      "label": "Alineación Horizontal del Contenido",
+      "label": "Alineación Horizontal",
       "options": [
-        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "flex-start", "label": "Izq" },
         { "value": "center", "label": "Centro" },
-        { "value": "flex-end", "label": "Derecha" }
+        { "value": "flex-end", "label": "Der" }
       ],
       "default": "center"
     },
-    { "type": "color", "id": "dot_color", "label": "Color del Punto Decorativo", "default": "#000000" },
+    { "type": "color", "id": "dot_color", "label": "Color Punto (si no hay imagen)", "default": "#000000" },
     {
       "type": "range",
       "id": "dot_size",
       "min": 4,
-      "max": 40,
+      "max": 80,
       "step": 2,
       "unit": "px",
-      "label": "Tamaño Punto",
+      "label": "Tamaño Punto/Imagen",
       "default": 12
     },
     { "type": "color", "id": "node_text_color", "label": "Color Texto Beneficio", "default": "#000000" },
@@ -351,16 +349,6 @@
         { "value": "900", "label": "Black" }
       ],
       "default": "700"
-    },
-    {
-      "type": "select",
-      "id": "node_text_transform",
-      "label": "Transformación",
-      "options": [
-        { "value": "none", "label": "Normal" },
-        { "value": "uppercase", "label": "MAYÚSCULAS" }
-      ],
-      "default": "uppercase"
     },
     {
       "type": "range",
@@ -388,10 +376,11 @@
       "type": "benefit",
       "name": "Beneficio",
       "settings": [
+        { "type": "image_picker", "id": "dot_image", "label": "Imagen del Punto (Ancla)" },
         {
           "type": "select",
           "id": "position",
-          "label": "Posición (Hora)",
+          "label": "Hora",
           "options": [
             { "value": "12", "label": "12:00" },
             { "value": "2", "label": "02:00" },
