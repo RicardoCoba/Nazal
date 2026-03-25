@@ -4,8 +4,8 @@
     padding: {{ section.settings.padding_v }}px 0;
     text-align: center;
     overflow: visible;
-    /* Perspectiva aumentada para un efecto 3D más dramático */
-    perspective: 800px;
+    /* Perspectiva más baja = efecto 3D más agresivo */
+    perspective: 600px;
   }
 
   .brand-header-{{ section.id }} {
@@ -13,27 +13,14 @@
     margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
   }
 
-  .brand-logo-{{ section.id }} {
-    width: {{ section.settings.logo_width }}px;
-    height: auto;
-    margin-bottom: 20px;
-    display: inline-block;
-  }
-
-  .brand-text-{{ section.id }} {
-    color: {{ section.settings.text_color }};
-    font-size: {{ section.settings.font_size }}px;
-    font-weight: {{ section.settings.font_weight }};
-    text-transform: {{ section.settings.text_transform }};
-    line-height: 1.2;
-  }
-
+  /* --- SISTEMA RELOJ --- */
   .circle-wrapper-{{ section.id }} {
     display: flex;
     justify-content: center;
     margin-top: {{ section.settings.circle_margin_top }}px;
     padding: 150px 0;
     position: relative;
+    transform-style: preserve-3d;
   }
 
   .circle-container-{{ section.id }} {
@@ -43,20 +30,19 @@
     border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
     border-radius: 50%;
     background-color: {{ section.settings.circle_bg_color }};
+    transform-style: preserve-3d;
   }
 
-  /* IMAGEN CENTRAL 3D INTENSIFICADA */
+  /* IMAGEN CENTRAL: EL PROTAGONISTA */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
     left: 50%;
-    /* Estado inicial: centrado y escala normal */
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) translateZ(50px);
     width: {{ section.settings.inner_image_width }}%;
-    z-index: 1;
+    z-index: 5;
     pointer-events: none;
-    /* Transición más rápida para respuesta inmediata */
-    transition: transform 0.1s ease-out;
+    transition: transform 0.1s linear;
     transform-style: preserve-3d;
     will-change: transform;
   }
@@ -65,12 +51,19 @@
     width: 100%;
     height: auto;
     display: block;
-    /* Sombra más pronunciada para mayor profundidad */
-    filter: drop-shadow(0 40px 50px rgba(0,0,0,0.3));
+    /* Sombra inicial */
+    filter: drop-shadow(0 40px 60px rgba(0,0,0,0.3));
+    transition: filter 0.1s linear;
   }
 
-  /* Nodos y Beneficios */
-  .clock-node-{{ section.id }} { position: absolute; width: 0; height: 0; z-index: 10; }
+  /* NODOS: AHORA CON MOVIMIENTO SUTIL */
+  .clock-node-{{ section.id }} {
+    position: absolute;
+    width: 0;
+    height: 0;
+    z-index: 10;
+    transition: transform 0.15s ease-out;
+  }
 
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px !important;
@@ -79,8 +72,7 @@
     border-radius: 50% !important;
     position: absolute !important;
     transform: translate(-50%, -50%) !important;
-    z-index: 20 !important;
-    display: block !important;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
 
   .node-content-{{ section.id }} {
@@ -98,12 +90,6 @@
     font-size: {{ section.settings.node_font_size }}px;
     font-weight: {{ section.settings.node_font_weight }};
     line-height: 1.1;
-  }
-
-  .node-icon-{{ section.id }} img {
-    width: {{ section.settings.node_icon_width }}px;
-    height: auto;
-    display: block;
   }
 
   /* Coordenadas */
@@ -129,28 +115,23 @@
 
 <div class="brand-statement-{{ section.id }}" id="Section-{{ section.id }}">
   <div class="container mx-auto px-6">
-    <div
-      class="brand-header-{{ section.id }}"
-      style="font-family: {{ section.settings.font_family.family }}, sans-serif;"
-    >
-      {%- if section.settings.logo != blank -%}
-        <img src="{{ section.settings.logo | image_url: width: 600 }}" class="brand-logo-{{ section.id }}" alt="Logo">
-      {%- endif -%}
-      {%- if section.settings.content != blank -%}
-        <div class="brand-text-{{ section.id }}">{{ section.settings.content }}</div>
-      {%- endif -%}
-    </div>
-
     <div class="circle-wrapper-{{ section.id }}">
       <div class="circle-container-{{ section.id }}">
         <div class="center-image-{{ section.id }}" id="Tilt-Image-{{ section.id }}">
           {%- if section.settings.circle_image != blank -%}
-            <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Product">
+            <img
+              src="{{ section.settings.circle_image | image_url: width: 1000 }}"
+              id="Product-Img-{{ section.id }}"
+              alt="Product"
+            >
           {%- endif -%}
         </div>
 
         {%- for block in section.blocks -%}
-          <div class="clock-node-{{ section.id }} pos-{{ block.settings.position }}" {{ block.shopify_attributes }}>
+          <div
+            class="clock-node-{{ section.id }} pos-{{ block.settings.position }} node-parallax"
+            {{ block.shopify_attributes }}
+          >
             <div class="node-dot-{{ section.id }}">&nbsp;</div>
             <div
               class="node-content-{{ section.id }}"
@@ -158,11 +139,6 @@
             >
               {%- if block.settings.node_text != blank -%}
                 <div class="node-text-{{ section.id }}">{{ block.settings.node_text | escape }}</div>
-              {%- endif -%}
-              {%- if block.settings.node_image != blank -%}
-                <div class="node-icon-{{ section.id }}">
-                  <img src="{{ block.settings.node_image | image_url: width: 300 }}" alt="Icon">
-                </div>
               {%- endif -%}
             </div>
           </div>
@@ -176,6 +152,9 @@
   document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('Section-{{ section.id }}');
     const image = document.getElementById('Tilt-Image-{{ section.id }}');
+    const imgTag = document.getElementById('Product-Img-{{ section.id }}');
+    const nodes = document.querySelectorAll('.node-parallax');
+
     if (!container || !image) return;
 
     container.addEventListener('mousemove', (e) => {
@@ -186,22 +165,44 @@
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      // --- AJUSTES DE INTENSIDAD ---
-      // Aumentamos el multiplicador a 25 (antes 12) para que rote más.
-      const rotateX = ((y - centerY) / centerY) * -25;
-      const rotateY = ((x - centerX) / centerX) * 25;
+      const percentX = (x - centerX) / centerX;
+      const percentY = (y - centerY) / centerY;
 
-      // Añadimos un ligero escalado (scale(1.05)) al mover el mouse
-      image.style.transform = `translate(-50%, -50%) scale(1.05) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      // 1. ROTACIÓN AGRESIVA (Imagen Central)
+      const rotateX = percentY * -35;
+      const rotateY = percentX * 35;
+      image.style.transform = `translate(-50%, -50%) scale(1.1) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+      // 2. SOMBRA DINÁMICA (Sigue la inclinación)
+      const shadowX = percentX * -20;
+      const shadowY = percentY * 40 + 40;
+      imgTag.style.filter = `drop-shadow(${shadowX}px ${shadowY}px 50px rgba(0,0,0,0.4))`;
+
+      // 3. PARALAJE INVERSO (Nodos se mueven al lado opuesto)
+      nodes.forEach((node) => {
+        const moveX = percentX * -15; // Se mueven 15px hacia el lado contrario
+        const moveY = percentY * -15;
+        node.style.transform = `translate(${moveX}px, ${moveY}px)`;
+      });
     });
 
     container.addEventListener('mouseleave', () => {
-      image.style.transition = 'transform 0.6s ease';
-      // Reseteamos rotación y escala a normal
+      image.style.transition = 'transform 0.5s ease';
+      imgTag.style.transition = 'filter 0.5s ease';
+
       image.style.transform = `translate(-50%, -50%) scale(1) rotateX(0deg) rotateY(0deg)`;
+      imgTag.style.filter = `drop-shadow(0 40px 60px rgba(0,0,0,0.3))`;
+
+      nodes.forEach((node) => {
+        node.style.transition = 'transform 0.5s ease';
+        node.style.transform = `translate(0, 0)`;
+      });
+
       setTimeout(() => {
-        image.style.transition = 'transform 0.1s ease-out';
-      }, 600);
+        image.style.transition = 'transform 0.1s linear';
+        imgTag.style.transition = 'filter 0.1s linear';
+        nodes.forEach((n) => (n.style.transition = 'transform 0.15s ease-out'));
+      }, 500);
     });
   });
 </script>
