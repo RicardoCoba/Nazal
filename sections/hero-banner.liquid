@@ -1,15 +1,18 @@
 {%- style -%}
+  /* Lógica de altura dinámica */
   .hero-slider-{{ section.id }} {
     {% if section.settings.height_mode == 'full' %}
       height: 100vh;
     {% elsif section.settings.height_mode == 'custom' %}
       height: {{ section.settings.custom_height }}px;
     {% else %}
+      /* Proporción basada en la primera imagen (Adapt) */
       aspect-ratio: {{ section.blocks.first.settings.image.aspect_ratio | default: '16/9' }};
       height: auto;
     {% endif %}
   }
 
+  /* Ajuste para móviles para que no se vea minúsculo si es custom */
   @media screen and (max-width: 768px) {
     .hero-slider-{{ section.id }} {
       height: {{ section.settings.mobile_height }}px;
@@ -28,11 +31,21 @@
         color: {{ block.settings.btn_bg_color }};
       {% endif %}
     }
+    .btn-custom-{{ block.id }}:hover {
+      filter: brightness(0.9);
+      {% if block.settings.button_style == 'outline' %}
+        background-color: {{ block.settings.btn_bg_color }} !important;
+        color: {{ block.settings.btn_text_color }} !important;
+      {% endif %}
+    }
   {%- endfor -%}
 {%- endstyle -%}
 
 <div class="relative overflow-hidden bg-black hero-slider-{{ section.id }}">
-  <div class="flex h-full" id="HeroSlider-{{ section.id }}">
+  <div
+    class="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)]"
+    id="HeroSlider-{{ section.id }}"
+  >
     {%- for block in section.blocks -%}
       <div class="min-w-full h-full relative flex-shrink-0" {{ block.shopify_attributes }}>
         {%- if block.settings.video_url != blank -%}
@@ -43,9 +56,7 @@
               loop: true,
               muted: true,
               controls: false,
-              class: 'absolute inset-0 w-full h-full object-cover',
-              poster: block.settings.video_poster
-            | image_url: width: 2000
+              class: 'absolute inset-0 w-full h-full object-cover'
           }}
         {%- elsif block.settings.image != blank -%}
           <img
@@ -79,22 +90,55 @@
       </div>
     {%- endfor -%}
   </div>
+
+  {%- comment -%} NAVEGACIÓN {%- endcomment -%}
+  <div class="absolute bottom-10 right-10 flex gap-2 z-20">
+    <button
+      onclick="moveHeroSlider(-1)"
+      class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M15 19l-7-7 7-7" stroke-width="2"/>
+      </svg>
+    </button>
+    <button
+      onclick="moveHeroSlider(1)"
+      class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M9 5l7 7-7 7" stroke-width="2"/>
+      </svg>
+    </button>
+  </div>
 </div>
+
+<script>
+  let currentHeroSlide = 0;
+  function moveHeroSlider(direction) {
+    const slider = document.getElementById('HeroSlider-{{ section.id }}');
+    const totalSlides = slider.children.length;
+    currentHeroSlide = (currentHeroSlide + direction + totalSlides) % totalSlides;
+    slider.style.transform = `translateX(-${currentHeroSlide * 100}%)`;
+  }
+</script>
 
 {% schema %}
 {
   "name": "Hero Video Slider Custom",
   "max_blocks": 5,
   "settings": [
-    { "type": "header", "content": "Altura" },
+    {
+      "type": "header",
+      "content": "Ajustes de Altura"
+    },
     {
       "type": "select",
       "id": "height_mode",
       "label": "Modo de Altura",
       "options": [
-        { "value": "full", "label": "Pantalla Completa" },
-        { "value": "adapt", "label": "Adaptar a Imagen" },
-        { "value": "custom", "label": "Altura Personalizada" }
+        { "value": "full", "label": "Pantalla Completa (100vh)" },
+        { "value": "adapt", "label": "Adaptar a la primera imagen" },
+        { "value": "custom", "label": "Altura Personalizada (Desktop)" }
       ],
       "default": "custom"
     },
@@ -105,7 +149,7 @@
       "max": 1000,
       "step": 10,
       "unit": "px",
-      "label": "Desktop",
+      "label": "Altura en Desktop",
       "default": 700
     },
     {
@@ -115,7 +159,7 @@
       "max": 800,
       "step": 10,
       "unit": "px",
-      "label": "Móvil",
+      "label": "Altura en Móvil",
       "default": 500
     }
   ],
@@ -124,15 +168,14 @@
       "type": "slide",
       "name": "Slide",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Imagen de fondo (si no hay video)" },
+        { "type": "image_picker", "id": "image", "label": "Imagen" },
         { "type": "video", "id": "video_url", "label": "Video" },
-        { "type": "image_picker", "id": "video_poster", "label": "Portada del Video (Carga previa)" },
         { "type": "text", "id": "title", "label": "Título", "default": "TITULO" },
         { "type": "text", "id": "subtext", "label": "Subtítulo", "default": "Descripción" },
         { "type": "header", "content": "Botón" },
         { "type": "text", "id": "button_label", "label": "Texto", "default": "COMPRAR" },
         { "type": "url", "id": "button_link", "label": "Enlace" },
-        { "type": "color", "id": "btn_bg_color", "label": "Color", "default": "#ffffff" },
+        { "type": "color", "id": "btn_bg_color", "label": "Fondo/Borde", "default": "#ffffff" },
         { "type": "color", "id": "btn_text_color", "label": "Texto", "default": "#000000" },
         {
           "type": "range",
