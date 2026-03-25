@@ -12,7 +12,7 @@
     {% endif %}
   }
 
-  /* Ajuste para móviles para que no se vea minúsculo si es custom */
+  /* Ajuste para móviles */
   @media screen and (max-width: 768px) {
     .hero-slider-{{ section.id }} {
       height: {{ section.settings.mobile_height }}px;
@@ -42,12 +42,10 @@
 {%- endstyle -%}
 
 <div class="relative overflow-hidden bg-black hero-slider-{{ section.id }}">
-  <div
-    class="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)]"
-    id="HeroSlider-{{ section.id }}"
-  >
+  <div class="flex h-full" id="HeroSlider-{{ section.id }}">
     {%- for block in section.blocks -%}
       <div class="min-w-full h-full relative flex-shrink-0" {{ block.shopify_attributes }}>
+        {%- comment -%} MEDIA: VIDEO O IMAGEN {%- endcomment -%}
         {%- if block.settings.video_url != blank -%}
           {{
             block.settings.video_url
@@ -66,6 +64,7 @@
           >
         {%- endif -%}
 
+        {%- comment -%} CONTENIDO SOBREPUESTO {%- endcomment -%}
         <div class="absolute inset-0 bg-black/40 flex {{ block.settings.vertical_alignment }} {{ block.settings.horizontal_alignment }} p-8 md:p-24">
           <div class="{{ block.settings.text_align }} max-w-3xl">
             <h2 class="text-white text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
@@ -90,37 +89,7 @@
       </div>
     {%- endfor -%}
   </div>
-
-  {%- comment -%} NAVEGACIÓN {%- endcomment -%}
-  <div class="absolute bottom-10 right-10 flex gap-2 z-20">
-    <button
-      onclick="moveHeroSlider(-1)"
-      class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path d="M15 19l-7-7 7-7" stroke-width="2"/>
-      </svg>
-    </button>
-    <button
-      onclick="moveHeroSlider(1)"
-      class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path d="M9 5l7 7-7 7" stroke-width="2"/>
-      </svg>
-    </button>
-  </div>
 </div>
-
-<script>
-  let currentHeroSlide = 0;
-  function moveHeroSlider(direction) {
-    const slider = document.getElementById('HeroSlider-{{ section.id }}');
-    const totalSlides = slider.children.length;
-    currentHeroSlide = (currentHeroSlide + direction + totalSlides) % totalSlides;
-    slider.style.transform = `translateX(-${currentHeroSlide * 100}%)`;
-  }
-</script>
 
 {% schema %}
 {
