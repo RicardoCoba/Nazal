@@ -32,7 +32,7 @@
     display: flex;
     justify-content: center;
     margin-top: {{ section.settings.circle_margin_top }}px;
-    padding: 120px 0;
+    padding: 150px 0; /* Aumentado para dar aire al alejamiento */
   }
 
   .circle-container-{{ section.id }} {
@@ -79,14 +79,13 @@
     z-index: 20;
   }
 
-  /* Contenedor de Texto e Imagen con Alineación Flexible */
+  /* Contenedor de Contenido */
   .node-content-{{ section.id }} {
     position: absolute;
     display: flex;
     flex-direction: column;
     gap: 10px;
     width: {{ section.settings.node_content_width }}px;
-    /* Nueva alineación dinámica */
     align-items: {{ section.settings.content_block_align }};
     text-align: {{ section.settings.content_block_align | replace: 'flex-start', 'left' | replace: 'flex-end', 'right' }};
   }
@@ -98,7 +97,7 @@
     text-transform: {{ section.settings.node_text_transform }};
     font-style: {{ section.settings.node_font_style }};
     line-height: 1.1;
-    width: 100%; /* Para que el text-align funcione */
+    width: 100%;
   }
 
   .node-icon-{{ section.id }} img {
@@ -115,20 +114,22 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
-  /* Posicionamiento del bloque respecto al punto */
-  .pos-12 .node-content-{{ section.id }} { bottom: 25px; left: 50%; transform: translateX(-50%); }
-  .pos-2 .node-content-{{ section.id }}  { left: 25px; top: 0; transform: translateY(-50%); }
-  .pos-4 .node-content-{{ section.id }}  { left: 25px; bottom: 0; transform: translateY(50%); }
-  .pos-6 .node-content-{{ section.id }}  { top: 25px; left: 50%; transform: translateX(-50%); }
-  .pos-8 .node-content-{{ section.id }}  { right: 25px; bottom: 0; transform: translateY(50%); }
-  .pos-10 .node-content-{{ section.id }} { right: 25px; top: 0; transform: translateY(-50%); }
+  /* --- SEPARACIÓN DINÁMICA --- */
+  {%- assign dist = section.settings.node_distance -%}
+
+  .pos-12 .node-content-{{ section.id }} { bottom: {{ dist }}px; left: 50%; transform: translateX(-50%); }
+  .pos-2 .node-content-{{ section.id }}  { left: {{ dist }}px; top: 0; transform: translateY(-50%); }
+  .pos-4 .node-content-{{ section.id }}  { left: {{ dist }}px; bottom: 0; transform: translateY(50%); }
+  .pos-6 .node-content-{{ section.id }}  { top: {{ dist }}px; left: 50%; transform: translateX(-50%); }
+  .pos-8 .node-content-{{ section.id }}  { right: {{ dist }}px; bottom: 0; transform: translateY(50%); }
+  .pos-10 .node-content-{{ section.id }} { right: {{ dist }}px; top: 0; transform: translateY(-50%); }
 
   {{ section.settings.font_family | font_face }}
   {{ section.settings.node_font_family | font_face }}
 
   @media screen and (max-width: 768px) {
     .circle-wrapper-{{ section.id }} { transform: scale(0.65); padding: 40px 0; }
-    .node-content-{{ section.id }} { width: 110px !important; }
+    .node-content-{{ section.id }} { width: 100px !important; }
   }
 {%- endstyle -%}
 
@@ -292,6 +293,16 @@
 
     { "type": "header", "content": "Estilo de los Beneficios (Bloques)" },
     {
+      "type": "range",
+      "id": "node_distance",
+      "min": 10,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Separación del Contenido al Punto",
+      "default": 30
+    },
+    {
       "type": "select",
       "id": "content_block_align",
       "label": "Alineación Horizontal del Contenido",
@@ -343,7 +354,7 @@
       "max": 500,
       "step": 10,
       "unit": "px",
-      "label": "Ancho del Texto/Bloque",
+      "label": "Ancho del Bloque",
       "default": 160
     },
     {
