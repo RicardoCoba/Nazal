@@ -91,9 +91,9 @@
         "bg_color": "#000000",
         "text_color": "#ffffff",
         "font_family": "assistant_n4",
-        "font_size": 26,
+        "font_size": 24,
         "font_weight": "700",
-        "text_transform": "none",
+        "text_transform": "uppercase",
         "cart_color": "#ffffff",
         "cart_size": 24,
         "padding_vertical": 0
