@@ -1,18 +1,16 @@
 {%- style -%}
-  /* Lógica de altura dinámica */
   .hero-slider-{{ section.id }} {
     {% if section.settings.height_mode == 'full' %}
       height: 100vh;
     {% elsif section.settings.height_mode == 'custom' %}
       height: {{ section.settings.custom_height }}px;
     {% else %}
-      /* Proporción basada en la primera imagen (Adapt) */
       aspect-ratio: {{ section.blocks.first.settings.image.aspect_ratio | default: '16/9' }};
       height: auto;
     {% endif %}
+    cursor: pointer;
   }
 
-  /* Ajuste para móviles para que no se vea minúsculo si es custom */
   @media screen and (max-width: 768px) {
     .hero-slider-{{ section.id }} {
       height: {{ section.settings.mobile_height }}px;
@@ -20,125 +18,117 @@
     }
   }
 
-  {%- for block in section.blocks -%}
-    .btn-custom-{{ block.id }} {
-      background-color: {{ block.settings.btn_bg_color }};
-      color: {{ block.settings.btn_text_color }};
-      border-radius: {{ block.settings.btn_radius }}px;
-      {% if block.settings.button_style == 'outline' %}
-        background-color: transparent !important;
-        border: 2px solid {{ block.settings.btn_bg_color }};
-        color: {{ block.settings.btn_bg_color }};
-      {% endif %}
-    }
-    .btn-custom-{{ block.id }}:hover {
-      filter: brightness(0.9);
-      {% if block.settings.button_style == 'outline' %}
-        background-color: {{ block.settings.btn_bg_color }} !important;
-        color: {{ block.settings.btn_text_color }} !important;
-      {% endif %}
-    }
-  {%- endfor -%}
+  .cover-overlay-{{ section.id }} {
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+    z-index: 20;
+    background-color: #000;
+  }
+
+  .cover-overlay-{{ section.id }}.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* Animación del botón de Play */
+  .play-button-wrapper {
+    transition: transform 0.3s ease;
+  }
+  .play-button-wrapper:hover {
+    transform: scale(1.1);
+  }
+
+  .pulse-animation {
+    animation: pulse-white 2s infinite;
+    border-radius: 50%;
+  }
+
+  @keyframes pulse-white {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+  }
 {%- endstyle -%}
 
-<div class="relative overflow-hidden bg-black hero-slider-{{ section.id }}">
-  <div
-    class="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.45,0,0.55,1)]"
-    id="HeroSlider-{{ section.id }}"
-  >
+<div
+  class="relative overflow-hidden bg-black hero-slider-{{ section.id }}"
+  id="HeroContainer-{{ section.id }}"
+  onclick="startHeroExperience(this)"
+>
+  <div class="flex h-full w-full">
     {%- for block in section.blocks -%}
       <div class="min-w-full h-full relative flex-shrink-0" {{ block.shopify_attributes }}>
         {%- if block.settings.video_url != blank -%}
           {{
             block.settings.video_url
             | video_tag:
-              autoplay: true,
+              autoplay: false,
               loop: true,
               muted: true,
               controls: false,
-              class: 'absolute inset-0 w-full h-full object-cover'
+              id: 'HeroVideo',
+              class: 'absolute inset-0 w-full h-full object-cover z-0'
           }}
-        {%- elsif block.settings.image != blank -%}
-          <img
-            src="{{ block.settings.image | image_url: width: 2000 }}"
-            class="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          >
         {%- endif -%}
 
-        <div class="absolute inset-0 bg-black/40 flex {{ block.settings.vertical_alignment }} {{ block.settings.horizontal_alignment }} p-8 md:p-24">
-          <div class="{{ block.settings.text_align }} max-w-3xl">
-            <h2 class="text-white text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
+        <div class="cover-overlay-{{ section.id }} absolute inset-0 flex flex-col items-center justify-center text-center">
+          {%- if block.settings.video_poster != blank -%}
+            <img
+              src="{{ block.settings.video_poster | image_url: width: 2000 }}"
+              class="absolute inset-0 w-full h-full object-cover z-10 opacity-60"
+              loading="eager"
+            >
+          {%- endif -%}
+
+          <div class="relative z-30 px-6 max-w-4xl">
+            <div class="play-button-wrapper mb-8 flex justify-center">
+              <div class="pulse-animation bg-white/20 p-6 backdrop-blur-sm border border-white/30">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 5V19L19 12L8 5Z" />
+                </svg>
+              </div>
+            </div>
+
+            <h2 class="text-white text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.9] mb-4 drop-shadow-2xl">
               {{ block.settings.title }}
             </h2>
-            <p class="text-white text-lg md:text-2xl font-light mb-10 drop-shadow-md max-w-xl {% if block.settings.text_align == 'text-center' %}mx-auto{% elsif block.settings.text_align == 'text-right' %}ml-auto{% endif %}">
+            <p class="text-white text-lg md:text-2xl font-light mb-0 drop-shadow-md">
               {{ block.settings.subtext }}
             </p>
-
-            {%- if block.settings.button_link != blank and block.settings.button_label != blank -%}
-              <div class="flex {% if block.settings.text_align == 'text-center' %}justify-center{% elsif block.settings.text_align == 'text-right' %}justify-end{% endif %}">
-                <a
-                  href="{{ block.settings.button_link }}"
-                  class="btn-custom-{{ block.id }} px-10 py-4 font-bold uppercase tracking-[0.2em] transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
-                >
-                  {{ block.settings.button_label }}
-                </a>
-              </div>
-            {%- endif -%}
           </div>
         </div>
       </div>
     {%- endfor -%}
   </div>
-
-  {%- comment -%} NAVEGACIÓN {%- endcomment -%}
-  <div class="absolute bottom-10 right-10 flex gap-2 z-20">
-    <button
-      onclick="moveHeroSlider(-1)"
-      class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path d="M15 19l-7-7 7-7" stroke-width="2"/>
-      </svg>
-    </button>
-    <button
-      onclick="moveHeroSlider(1)"
-      class="w-12 h-12 flex items-center justify-center border border-white/30 text-white hover:bg-white hover:text-black transition-all"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path d="M9 5l7 7-7 7" stroke-width="2"/>
-      </svg>
-    </button>
-  </div>
 </div>
 
 <script>
-  let currentHeroSlide = 0;
-  function moveHeroSlider(direction) {
-    const slider = document.getElementById('HeroSlider-{{ section.id }}');
-    const totalSlides = slider.children.length;
-    currentHeroSlide = (currentHeroSlide + direction + totalSlides) % totalSlides;
-    slider.style.transform = `translateX(-${currentHeroSlide * 100}%)`;
+  function startHeroExperience(container) {
+    // 1. Ocultar la portada
+    const overlay = container.querySelector('.cover-overlay-{{ section.id }}');
+    overlay.classList.add('is-hidden');
+
+    // 2. Darle play al video
+    const video = container.querySelector('#HeroVideo');
+    if (video) {
+      video.play();
+    }
   }
 </script>
 
 {% schema %}
 {
-  "name": "Hero Video Slider Custom",
-  "max_blocks": 5,
+  "name": "Hero Play Video Cover",
+  "max_blocks": 1,
   "settings": [
-    {
-      "type": "header",
-      "content": "Ajustes de Altura"
-    },
+    { "type": "header", "content": "Altura" },
     {
       "type": "select",
       "id": "height_mode",
       "label": "Modo de Altura",
       "options": [
-        { "value": "full", "label": "Pantalla Completa (100vh)" },
-        { "value": "adapt", "label": "Adaptar a la primera imagen" },
-        { "value": "custom", "label": "Altura Personalizada (Desktop)" }
+        { "value": "full", "label": "Pantalla Completa" },
+        { "value": "custom", "label": "Altura Personalizada" }
       ],
       "default": "custom"
     },
@@ -149,7 +139,7 @@
       "max": 1000,
       "step": 10,
       "unit": "px",
-      "label": "Altura en Desktop",
+      "label": "Desktop",
       "default": 700
     },
     {
@@ -159,7 +149,7 @@
       "max": 800,
       "step": 10,
       "unit": "px",
-      "label": "Altura en Móvil",
+      "label": "Móvil",
       "default": 500
     }
   ],
@@ -168,72 +158,13 @@
       "type": "slide",
       "name": "Slide",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "Imagen" },
-        { "type": "video", "id": "video_url", "label": "Video" },
-        { "type": "text", "id": "title", "label": "Título", "default": "TITULO" },
-        { "type": "text", "id": "subtext", "label": "Subtítulo", "default": "Descripción" },
-        { "type": "header", "content": "Botón" },
-        { "type": "text", "id": "button_label", "label": "Texto", "default": "COMPRAR" },
-        { "type": "url", "id": "button_link", "label": "Enlace" },
-        { "type": "color", "id": "btn_bg_color", "label": "Fondo/Borde", "default": "#ffffff" },
-        { "type": "color", "id": "btn_text_color", "label": "Texto", "default": "#000000" },
-        {
-          "type": "range",
-          "id": "btn_radius",
-          "min": 0,
-          "max": 50,
-          "step": 2,
-          "unit": "px",
-          "label": "Redondeado",
-          "default": 0
-        },
-        {
-          "type": "select",
-          "id": "button_style",
-          "label": "Estilo",
-          "options": [
-            { "value": "solid", "label": "Sólido" },
-            { "value": "outline", "label": "Contorno" }
-          ],
-          "default": "solid"
-        },
-        { "type": "header", "content": "Alineación" },
-        {
-          "type": "select",
-          "id": "horizontal_alignment",
-          "label": "Horizontal",
-          "options": [
-            { "value": "justify-start", "label": "Izquierda" },
-            { "value": "justify-center", "label": "Centro" },
-            { "value": "justify-end", "label": "Derecha" }
-          ],
-          "default": "justify-start"
-        },
-        {
-          "type": "select",
-          "id": "vertical_alignment",
-          "label": "Vertical",
-          "options": [
-            { "value": "items-start", "label": "Arriba" },
-            { "value": "items-center", "label": "Centro" },
-            { "value": "items-end", "label": "Abajo" }
-          ],
-          "default": "items-center"
-        },
-        {
-          "type": "select",
-          "id": "text_align",
-          "label": "Alineación Texto",
-          "options": [
-            { "value": "text-left", "label": "Izquierda" },
-            { "value": "text-center", "label": "Centro" },
-            { "value": "text-right", "label": "Derecha" }
-          ],
-          "default": "text-left"
-        }
+        { "type": "video", "id": "video_url", "label": "Video de Fondo" },
+        { "type": "image_picker", "id": "video_poster", "label": "Imagen de Portada" },
+        { "type": "text", "id": "title", "label": "Título", "default": "THE COLLECTION" },
+        { "type": "text", "id": "subtext", "label": "Subtítulo", "default": "Haga clic para reproducir" }
       ]
     }
   ],
-  "presets": [{ "name": "Hero Video Slider Custom" }]
+  "presets": [{ "name": "Hero Play Video Cover" }]
 }
 {% endschema %}
