@@ -1,132 +1,132 @@
 {%- style -%}
   .brand-statement-{{ section.id }} {
-    background-color: {{ section.settings.bg_color }};
-    padding: {{ section.settings.padding_v }}px 0;
-    text-align: center;
-    overflow: visible;
+    background-color: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_v }}px 0;
+    text-align: center;
+    overflow: visible;
   }
 
   .brand-header-{{ section.id }} {
-    max-width: {{ section.settings.content_max_width }}px;
-    margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
+    max-width: {{ section.settings.content_max_width }}px;
+    margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
   }
 
   .brand-logo-{{ section.id }} {
-    width: {{ section.settings.logo_width }}px;
-    height: auto;
-    margin-bottom: 20px;
-    display: inline-block;
+    width: {{ section.settings.logo_width }}px;
+    height: auto;
+    margin-bottom: 20px;
+    display: inline-block;
   }
 
   .brand-text-{{ section.id }} {
-    color: {{ section.settings.text_color }};
-    font-size: {{ section.settings.font_size }}px;
-    font-weight: {{ section.settings.font_weight }};
-    text-transform: {{ section.settings.text_transform }};
-    line-height: 1.2;
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.font_size }}px;
+    font-weight: {{ section.settings.font_weight }};
+    text-transform: {{ section.settings.text_transform }};
+    line-height: 1.2;
   }
 
   /* --- SISTEMA RELOJ --- */
   .circle-wrapper-{{ section.id }} {
-    display: flex;
-    justify-content: center;
-    margin-top: {{ section.settings.circle_margin_top }}px;
-    padding: 150px 0;
-    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: {{ section.settings.circle_margin_top }}px;
+    padding: 150px 0;
+    position: relative;
   }
 
   .circle-container-{{ section.id }} {
-    position: relative;
-    width: {{ section.settings.circle_size }}px;
-    height: {{ section.settings.circle_size }}px;
-    border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
-    border-radius: 50%;
-    background-color: {{ section.settings.circle_bg_color }};
+    position: relative;
+    width: {{ section.settings.circle_size }}px;
+    height: {{ section.settings.circle_size }}px;
+    border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
+    border-radius: 50%;
+    background-color: {{ section.settings.circle_bg_color }};
   }
 
   .center-image-{{ section.id }} {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: {{ section.settings.inner_image_width }}%;
-    z-index: 1;
-    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: {{ section.settings.inner_image_width }}%;
+    z-index: 1;
+    pointer-events: none;
   }
 
   .center-image-{{ section.id }} img {
-    width: 100%;
-    height: auto;
-    display: block;
+    width: 100%;
+    height: auto;
+    display: block;
   }
 
   /* Nodos */
   .clock-node-{{ section.id }} {
-    position: absolute;
-    width: 0;
-    height: 0;
-    z-index: 10;
+    position: absolute;
+    width: 0;
+    height: 0;
+    z-index: 10;
   }
 
   /* EL PUNTO: Forzado para que no se oculte */
   .node-dot-{{ section.id }} {
-    width: {{ section.settings.dot_size }}px !important;
-    height: {{ section.settings.dot_size }}px !important;
-    background-color: {{ section.settings.dot_color }} !important;
-    border-radius: 50% !important;
-    position: absolute !important;
-    transform: translate(-50%, -50%) !important;
-    z-index: 20 !important;
-    display: block !important; /* Salta la regla de display:none */
-    line-height: 0;
-    font-size: 0;
+    width: {{ section.settings.dot_size }}px !important;
+    height: {{ section.settings.dot_size }}px !important;
+    background-color: {{ section.settings.dot_color }} !important;
+    border-radius: 50% !important;
+    position: absolute !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 20 !important;
+    display: block !important; /* Salta la regla de display:none */
+    line-height: 0;
+    font-size: 0;
   }
 
   /* Contenedor de Contenido */
   .node-content-{{ section.id }} {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: {{ section.settings.node_content_width }}px;
-    align-items: {{ section.settings.content_block_align }};
-    text-align: {{ section.settings.content_block_align | replace: 'flex-start', 'left' | replace: 'flex-end', 'right' }};
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: {{ section.settings.node_content_width }}px;
+    align-items: {{ section.settings.content_block_align }};
+    text-align: {{ section.settings.content_block_align | replace: 'flex-start', 'left' | replace: 'flex-end', 'right' }};
   }
 
   .node-text-{{ section.id }} {
-    color: {{ section.settings.node_text_color }};
-    font-size: {{ section.settings.node_font_size }}px;
-    font-weight: {{ section.settings.node_font_weight }};
-    text-transform: {{ section.settings.node_text_transform }};
-    line-height: 1.1;
-    width: 100%;
+    color: {{ section.settings.node_text_color }};
+    font-size: {{ section.settings.node_font_size }}px;
+    font-weight: {{ section.settings.node_font_weight }};
+    text-transform: {{ section.settings.node_text_transform }};
+    line-height: 1.1;
+    width: 100%;
   }
 
   .node-icon-{{ section.id }} img {
-    width: {{ section.settings.node_icon_width }}px;
-    height: auto;
-    display: block;
+    width: {{ section.settings.node_icon_width }}px;
+    height: auto;
+    display: block;
   }
 
   /* Coordenadas Horarias */
   .pos-12 { top: 0%; left: 50%; }
-  .pos-2  { top: 25%; left: 93.3%; }
-  .pos-4  { top: 75%; left: 93.3%; }
-  .pos-6  { top: 100%; left: 50%; }
-  .pos-8  { top: 75%; left: 6.7%; }
+  .pos-2  { top: 25%; left: 93.3%; }
+  .pos-4  { top: 75%; left: 93.3%; }
+  .pos-6  { top: 100%; left: 50%; }
+  .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
   {%- assign dist = section.settings.node_distance -%}
   .pos-12 .node-content-{{ section.id }} { bottom: {{ dist }}px; left: 50%; transform: translateX(-50%); }
-  .pos-2  .node-content-{{ section.id }} { left: {{ dist }}px; top: 0; transform: translateY(-50%); }
-  .pos-4  .node-content-{{ section.id }} { left: {{ dist }}px; bottom: 0; transform: translateY(50%); }
-  .pos-6  .node-content-{{ section.id }} { top: {{ dist }}px; left: 50%; transform: translateX(-50%); }
-  .pos-8  .node-content-{{ section.id }} { right: {{ dist }}px; bottom: 0; transform: translateY(50%); }
+  .pos-2  .node-content-{{ section.id }} { left: {{ dist }}px; top: 0; transform: translateY(-50%); }
+  .pos-4  .node-content-{{ section.id }} { left: {{ dist }}px; bottom: 0; transform: translateY(50%); }
+  .pos-6  .node-content-{{ section.id }} { top: {{ dist }}px; left: 50%; transform: translateX(-50%); }
+  .pos-8  .node-content-{{ section.id }} { right: {{ dist }}px; bottom: 0; transform: translateY(50%); }
   .pos-10 .node-content-{{ section.id }} { right: {{ dist }}px; top: 0; transform: translateY(-50%); }
 
   @media screen and (max-width: 768px) {
-    .circle-wrapper-{{ section.id }} { transform: scale(0.65); padding: 40px 0; }
-    .node-content-{{ section.id }} { width: 100px !important; }
+    .circle-wrapper-{{ section.id }} { transform: scale(0.65); padding: 40px 0; }
+    .node-content-{{ section.id }} { width: 100px !important; }
   }
 {%- endstyle -%}
 
@@ -134,15 +134,15 @@
   <div class="container mx-auto px-6">
     <div
       class="brand-header-{{ section.id }}"
-
       style="font-family: {{ section.settings.font_family.family }}, sans-serif;"
     >
       {%- if section.settings.logo != blank -%}
         <img src="{{ section.settings.logo | image_url: width: 600 }}" class="brand-logo-{{ section.id }}" alt="Logo">
       {%- endif -%}
-
       {%- if section.settings.content != blank -%}
-        <div class="brand-text-{{ section.id }}">{{ section.settings.content }}</div>
+        <div class="brand-text-{{ section.id }}">
+          {{ section.settings.content }}
+        </div>
       {%- endif -%}
     </div>
 
@@ -160,11 +160,12 @@
 
             <div
               class="node-content-{{ section.id }}"
-
               style="font-family: {{ section.settings.node_font_family.family }}, sans-serif;"
             >
               {%- if block.settings.node_text != blank -%}
-                <div class="node-text-{{ section.id }}">{{ block.settings.node_text | escape }}</div>
+                <div class="node-text-{{ section.id }}">
+                  {{ block.settings.node_text | escape }}
+                </div>
               {%- endif -%}
 
               {%- if block.settings.node_image != blank -%}
