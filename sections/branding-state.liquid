@@ -1,14 +1,41 @@
 {%- style -%}
+  /* --- ANIMACIÓN LÁMPARA DE LAVA --- */
+  @keyframes lava-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
   .brand-statement-{{ section.id }} {
-    background-color: {{ section.settings.bg_color }};
+    /* Fondo estilo lámpara de lava con gradientes */
+    background: linear-gradient(-45deg, #000000, #1a1a1a, #434343, #000000);
+    background-size: 400% 400%;
+    animation: lava-animation 15s ease infinite;
     padding: {{ section.settings.padding_v }}px 0;
     text-align: center;
-    overflow: visible;
+    overflow: hidden; /* Cambiado a hidden para que el brillo no se salga */
+    position: relative;
+  }
+
+  /* --- CURSOR GLOW (EL PUNTO DIFUMINADO) --- */
+  .cursor-glow-{{ section.id }} {
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: overlay; /* Esto hace que brille sobre el fondo */
+    display: none;
   }
 
   .brand-header-{{ section.id }} {
     max-width: {{ section.settings.content_max_width }}px;
     margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
+    position: relative;
+    z-index: 10;
   }
 
   .brand-logo-{{ section.id }} {
@@ -16,10 +43,18 @@
     height: auto;
     margin-bottom: 20px;
     display: inline-block;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+  }
+
+  /* TEXTO DINÁMICO: Blanco con Blend Mode para que reaccione a la lava */
+  .brand-text-{{ section.id }}, .node-text-{{ section.id }} {
+    color: #ffffff;
+    mix-blend-mode: difference; /* El texto cambiará de tono según el fondo */
+    position: relative;
+    z-index: 10;
   }
 
   .brand-text-{{ section.id }} {
-    color: {{ section.settings.text_color }};
     font-size: {{ section.settings.font_size }}px;
     font-weight: {{ section.settings.font_weight }};
     text-transform: {{ section.settings.text_transform }};
@@ -33,21 +68,22 @@
     margin-top: {{ section.settings.circle_margin_top }}px;
     padding: 150px 0;
     position: relative;
+    z-index: 5;
   }
 
   .circle-container-{{ section.id }} {
     position: relative;
     width: {{ section.settings.circle_size }}px;
     height: {{ section.settings.circle_size }}px;
-    border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
+    border: {{ section.settings.circle_border_width }}px solid rgba(255,255,255,0.1);
     border-radius: 50%;
-    background-color: {{ section.settings.circle_bg_color }};
+    background-color: transparent;
+    box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
   }
 
   .center-image-{{ section.id }} {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     width: {{ section.settings.inner_image_width }}%;
     z-index: 1;
@@ -55,34 +91,24 @@
   }
 
   .center-image-{{ section.id }} img {
-    width: 100%;
-    height: auto;
-    display: block;
+    width: 100%; height: auto; display: block;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));
   }
 
-  /* Nodos */
-  .clock-node-{{ section.id }} {
-    position: absolute;
-    width: 0;
-    height: 0;
-    z-index: 10;
-  }
+  .clock-node-{{ section.id }} { position: absolute; width: 0; height: 0; z-index: 10; }
 
-  /* EL PUNTO: Forzado para que no se oculte */
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px !important;
     height: {{ section.settings.dot_size }}px !important;
-    background-color: {{ section.settings.dot_color }} !important;
+    background-color: #ffffff !important;
     border-radius: 50% !important;
     position: absolute !important;
     transform: translate(-50%, -50%) !important;
     z-index: 20 !important;
-    display: block !important; /* Salta la regla de display:none */
-    line-height: 0;
-    font-size: 0;
+    display: block !important;
+    box-shadow: 0 0 15px rgba(255,255,255,0.5);
   }
 
-  /* Contenedor de Contenido */
   .node-content-{{ section.id }} {
     position: absolute;
     display: flex;
@@ -94,7 +120,6 @@
   }
 
   .node-text-{{ section.id }} {
-    color: {{ section.settings.node_text_color }};
     font-size: {{ section.settings.node_font_size }}px;
     font-weight: {{ section.settings.node_font_weight }};
     text-transform: {{ section.settings.node_text_transform }};
@@ -106,9 +131,10 @@
     width: {{ section.settings.node_icon_width }}px;
     height: auto;
     display: block;
+    filter: grayscale(1) invert(1); /* Para que los iconos sean blancos */
   }
 
-  /* Coordenadas Horarias */
+  /* Coordenadas */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -127,10 +153,13 @@
   @media screen and (max-width: 768px) {
     .circle-wrapper-{{ section.id }} { transform: scale(0.65); padding: 40px 0; }
     .node-content-{{ section.id }} { width: 100px !important; }
+    .cursor-glow-{{ section.id }} { display: none !important; }
   }
 {%- endstyle -%}
 
-<div class="brand-statement-{{ section.id }}">
+<div class="brand-statement-{{ section.id }}" id="Section-{{ section.id }}">
+  <div class="cursor-glow-{{ section.id }}" id="Cursor-{{ section.id }}"></div>
+
   <div class="container mx-auto px-6">
     <div
       class="brand-header-{{ section.id }}"
@@ -157,7 +186,6 @@
         {%- for block in section.blocks -%}
           <div class="clock-node-{{ section.id }} pos-{{ block.settings.position }}" {{ block.shopify_attributes }}>
             <div class="node-dot-{{ section.id }}">&nbsp;</div>
-
             <div
               class="node-content-{{ section.id }}"
               style="font-family: {{ section.settings.node_font_family.family }}, sans-serif;"
@@ -167,7 +195,6 @@
                   {{ block.settings.node_text | escape }}
                 </div>
               {%- endif -%}
-
               {%- if block.settings.node_image != blank -%}
                 <div class="node-icon-{{ section.id }}">
                   <img src="{{ block.settings.node_image | image_url: width: 300 }}" alt="Icon">
@@ -181,12 +208,32 @@
   </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const section = document.getElementById('Section-{{ section.id }}');
+    const cursor = document.getElementById('Cursor-{{ section.id }}');
+
+    section.addEventListener('mousemove', (e) => {
+      cursor.style.display = 'block';
+      // Ajuste de posición para que el brillo siga al mouse
+      const x = e.clientX;
+      const y = e.clientY;
+      cursor.style.left = x + 'px';
+      cursor.style.top = y + 'px';
+    });
+
+    section.addEventListener('mouseleave', () => {
+      cursor.style.display = 'none';
+    });
+  });
+</script>
+
 {% schema %}
 {
   "name": "Brand Circular Feature",
   "settings": [
     { "type": "header", "content": "Sección" },
-    { "type": "color", "id": "bg_color", "label": "Fondo Sección", "default": "#ffffff" },
+    { "type": "color", "id": "bg_color", "label": "Color Base (Fondo)", "default": "#000000" },
     {
       "type": "range",
       "id": "padding_v",
@@ -197,7 +244,6 @@
       "label": "Padding Vertical",
       "default": 100
     },
-
     { "type": "header", "content": "Logo y Texto Superior" },
     { "type": "image_picker", "id": "logo", "label": "Logo" },
     {
@@ -211,7 +257,6 @@
       "default": 150
     },
     { "type": "richtext", "id": "content", "label": "Texto Principal" },
-    { "type": "color", "id": "text_color", "label": "Color Texto", "default": "#000000" },
     { "type": "font_picker", "id": "font_family", "label": "Fuente Principal", "default": "assistant_n4" },
     {
       "type": "range",
@@ -243,7 +288,6 @@
       "label": "Margen abajo cabecera",
       "default": 60
     },
-
     { "type": "header", "content": "Círculo de Producto" },
     { "type": "image_picker", "id": "circle_image", "label": "Imagen del Producto (Centro)" },
     {
@@ -256,7 +300,6 @@
       "label": "Diámetro Círculo",
       "default": 400
     },
-    { "type": "color", "id": "circle_border_color", "label": "Color Línea Círculo", "default": "#e0e0e0" },
     {
       "type": "range",
       "id": "circle_border_width",
@@ -287,8 +330,7 @@
       "label": "Margen Superior",
       "default": 40
     },
-
-    { "type": "header", "content": "Estilo de los Beneficios (Bloques)" },
+    { "type": "header", "content": "Estilo de los Beneficios" },
     {
       "type": "range",
       "id": "node_distance",
@@ -296,13 +338,13 @@
       "max": 200,
       "step": 5,
       "unit": "px",
-      "label": "Separación del Contenido al Punto",
+      "label": "Distancia Texto",
       "default": 30
     },
     {
       "type": "select",
       "id": "content_block_align",
-      "label": "Alineación Horizontal",
+      "label": "Alineación",
       "options": [
         { "value": "flex-start", "label": "Izquierda" },
         { "value": "center", "label": "Centro" },
@@ -310,7 +352,6 @@
       ],
       "default": "center"
     },
-    { "type": "color", "id": "dot_color", "label": "Color del Punto", "default": "#000000" },
     {
       "type": "range",
       "id": "dot_size",
@@ -321,7 +362,6 @@
       "label": "Tamaño Punto",
       "default": 12
     },
-    { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
     { "type": "font_picker", "id": "node_font_family", "label": "Fuente Beneficios", "default": "assistant_n4" },
     {
       "type": "range",
@@ -361,7 +401,7 @@
       "max": 200,
       "step": 5,
       "unit": "px",
-      "label": "Tamaño Icono/Imagen",
+      "label": "Tamaño Icono",
       "default": 40
     }
   ],
@@ -373,7 +413,7 @@
         {
           "type": "select",
           "id": "position",
-          "label": "Posición (Hora)",
+          "label": "Hora",
           "options": [
             { "value": "12", "label": "12:00" },
             { "value": "2", "label": "02:00" },
@@ -384,8 +424,8 @@
           ],
           "default": "12"
         },
-        { "type": "text", "id": "node_text", "label": "Texto del Beneficio" },
-        { "type": "image_picker", "id": "node_image", "label": "Icono/Imagen" }
+        { "type": "text", "id": "node_text", "label": "Texto" },
+        { "type": "image_picker", "id": "node_image", "label": "Icono" }
       ]
     }
   ],
