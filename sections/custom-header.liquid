@@ -1,4 +1,5 @@
 {%- style -%}
+  /* Configuración del Contenedor Principal */
   .custom-header-{{ section.id }} {
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_vertical }}px 0;
@@ -6,21 +7,25 @@
     top: 0;
     z-index: 1000;
     width: 100%;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
+  /* Grid Principal de 3 Columnas (Izquierda - Centro - Derecha) */
   .header-grid-{{ section.id }} {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    align-items: {{ section.settings.vertical_alignment }}; /* Control Vertical */
+    align-items: {{ section.settings.vertical_alignment }};
     min-height: {{ section.settings.header_min_height }}px;
+    gap: 20px;
   }
 
+  /* Lógica de Menús con Anchos Iguales */
   .nav-group-{{ section.id }} {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr; /* Fuerza a que cada columna mida lo mismo */
     gap: {{ section.settings.gap_links }}px;
-    justify-content: {{ section.settings.horizontal_alignment }}; /* Control Horizontal */
+    width: 100%;
   }
 
   .header-nav-link-{{ section.id }} {
@@ -31,24 +36,45 @@
     font-style: {{ section.settings.font_style }};
     text-decoration: none;
     white-space: nowrap;
+
+    /* Centrado del texto dentro de su espacio igualitario */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     transition: all 0.3s ease;
+    padding: 5px 0;
   }
 
   .header-nav-link-{{ section.id }}:hover {
-    opacity: 0.6;
-    transform: translateY(-1px);
+    opacity: 0.5;
   }
 
+  /* Fuente Personalizada */
   {{ section.settings.font_family | font_face }}
   .font-header-{{ section.id }} {
     font-family: {{ section.settings.font_family.family }}, {{ section.settings.font_family.fallback_families }};
   }
+
+  /* Ajuste para el contenedor de la derecha (Menú + Carrito) */
+  .right-side-{{ section.id }} {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 30px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .nav-group-{{ section.id }} {
+      display: none; /* Oculta menús en móvil para evitar desbordamiento */
+    }
+  }
 {%- endstyle -%}
 
 <header class="custom-header-{{ section.id }} font-header-{{ section.id }}">
-  <div class="container mx-auto px-6">
+  <div class="container mx-auto px-6 lg:px-12">
     <div class="header-grid-{{ section.id }}">
-      <nav class="nav-group-{{ section.id }}" style="justify-content: flex-start;">
+      <nav class="nav-group-{{ section.id }}">
         {%- for link in section.settings.menu_left.links -%}
           <a href="{{ link.url }}" class="header-nav-link-{{ section.id }}">
             {{ link.title }}
@@ -60,20 +86,20 @@
         <a href="{{ routes.root_url }}" class="flex items-center">
           {%- if section.settings.logo != blank -%}
             <img
-              src="{{ section.settings.logo | image_url: width: 500 }}"
+              src="{{ section.settings.logo | image_url: width: 600 }}"
               alt="{{ shop.name }}"
               style="width: {{ section.settings.logo_width }}px; height: auto; display: block;"
             >
           {%- else -%}
-            <span style="color: {{ section.settings.text_color }}; font-size: 1.8rem; font-weight: 900; text-transform: uppercase; font-style: italic;">
+            <span style="color: {{ section.settings.text_color }}; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; font-style: italic; letter-spacing: -1px;">
               {{ shop.name }}
             </span>
           {%- endif -%}
         </a>
       </div>
 
-      <div class="nav-group-{{ section.id }}" style="justify-content: flex-end;">
-        <nav class="flex items-center" style="gap: {{ section.settings.gap_links }}px;">
+      <div class="right-side-{{ section.id }}">
+        <nav class="nav-group-{{ section.id }}">
           {%- for link in section.settings.menu_right.links -%}
             <a href="{{ link.url }}" class="header-nav-link-{{ section.id }}">
               {{ link.title }}
@@ -81,7 +107,7 @@
           {%- endfor -%}
         </nav>
 
-        <a href="{{ routes.cart_url }}" class="relative flex items-center ml-4">
+        <a href="{{ routes.cart_url }}" class="relative flex items-center shrink-0">
           <svg
             width="{{ section.settings.cart_size }}"
             height="{{ section.settings.cart_size }}"
@@ -92,7 +118,7 @@
             <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="{{ section.settings.cart_color }}"/>
           </svg>
           {%- if cart.item_count > 0 -%}
-            <span style="position: absolute; top: -8px; right: -8px; background: {{ section.settings.text_color }}; color: {{ section.settings.bg_color }}; font-size: 10px; font-weight: bold; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">
+            <span style="position: absolute; top: -10px; right: -10px; background: {{ section.settings.cart_color }}; color: {{ section.settings.bg_color }}; font-size: 9px; font-weight: 900; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border: 1px solid {{ section.settings.bg_color }};">
               {{ cart.item_count }}
             </span>
           {%- endif -%}
@@ -106,7 +132,7 @@
 {
   "name": "Custom Split Header Pro",
   "settings": [
-    { "type": "header", "content": "Estructura y Comportamiento" },
+    { "type": "header", "content": "Comportamiento" },
     {
       "type": "select",
       "id": "sticky_header",
@@ -121,16 +147,16 @@
       "type": "range",
       "id": "header_min_height",
       "min": 40,
-      "max": 200,
+      "max": 250,
       "step": 5,
       "unit": "px",
-      "label": "Altura mínima del Header",
-      "default": 80
+      "label": "Altura mínima",
+      "default": 90
     },
     {
       "type": "select",
       "id": "vertical_alignment",
-      "label": "Alineación Vertical (Todo)",
+      "label": "Alineación Vertical",
       "options": [
         { "value": "start", "label": "Arriba" },
         { "value": "center", "label": "Centro" },
@@ -148,22 +174,22 @@
       "step": 5,
       "unit": "px",
       "label": "Ancho del Logo",
-      "default": 120
+      "default": 130
     },
-    { "type": "header", "content": "Navegación" },
+    { "type": "header", "content": "Menús (Divididos)" },
     { "type": "link_list", "id": "menu_left", "label": "Menú Izquierdo" },
     { "type": "link_list", "id": "menu_right", "label": "Menú Derecho" },
     {
       "type": "range",
       "id": "gap_links",
-      "min": 10,
+      "min": 0,
       "max": 100,
       "step": 5,
       "unit": "px",
       "label": "Espacio entre enlaces",
-      "default": 30
+      "default": 20
     },
-    { "type": "header", "content": "Estilos Visuales" },
+    { "type": "header", "content": "Estilos de Texto" },
     { "type": "color", "id": "bg_color", "label": "Fondo", "default": "#000000" },
     { "type": "color", "id": "text_color", "label": "Letras", "default": "#ffffff" },
     { "type": "font_picker", "id": "font_family", "label": "Tipografía", "default": "assistant_n4" },
@@ -175,7 +201,7 @@
       "step": 1,
       "unit": "px",
       "label": "Tamaño Letra",
-      "default": 14
+      "default": 13
     },
     {
       "type": "select",
@@ -199,6 +225,16 @@
       ],
       "default": "uppercase"
     },
+    {
+      "type": "select",
+      "id": "font_style",
+      "label": "Estilo",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "italic", "label": "Itálica" }
+      ],
+      "default": "normal"
+    },
     { "type": "header", "content": "Carrito" },
     { "type": "color", "id": "cart_color", "label": "Color Icono", "default": "#ffffff" },
     {
@@ -209,9 +245,9 @@
       "step": 2,
       "unit": "px",
       "label": "Tamaño Icono",
-      "default": 24
+      "default": 22
     },
-    { "type": "header", "content": "Padding" },
+    { "type": "header", "content": "Espaciado" },
     {
       "type": "range",
       "id": "padding_vertical",
@@ -219,8 +255,8 @@
       "max": 100,
       "step": 5,
       "unit": "px",
-      "label": "Espacio Arriba/Abajo",
-      "default": 20
+      "label": "Padding Superior/Inferior",
+      "default": 25
     }
   ],
   "presets": [{ "name": "Custom Split Header Pro" }]
