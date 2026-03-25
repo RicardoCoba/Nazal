@@ -13,6 +13,7 @@
     margin: {{ section.settings.circle_margin_top }}px auto;
     padding: 160px 0;
     position: relative;
+    overflow: visible !important;
   }
 
   .circle-container-{{ section.id }} {
@@ -26,42 +27,51 @@
 
   .clock-node-{{ section.id }} {
     position: absolute;
-    width: 1px;
-    height: 1px;
+    width: 2px;
+    height: 2px;
     z-index: 100;
   }
 
-  /* Contenedor del Punto (Ya no estará vacío gracias al SVG) */
+  /* EL PUNTO: Ahora es un contenedor para la imagen que subas */
   .node-dot-{{ section.id }} {
-    width: {{ section.settings.dot_size }}px !important;
-    height: {{ section.settings.dot_size }}px !important;
     position: absolute !important;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
-    display: flex !important; /* Para centrar el SVG */
-    align-items: center;
-    justify-content: center;
+    z-index: 110;
+    display: block !important;
   }
 
-  .node-dot-{{ section.id }} svg {
-    width: 100%;
-    height: 100%;
-    fill: {{ section.settings.dot_color }}; /* Controlamos el color desde aquí */
-    display: block;
+  .node-dot-{{ section.id }} img {
+    width: {{ section.settings.dot_size }}px !important;
+    height: {{ section.settings.dot_size }}px !important;
+    display: block !important;
+    object-fit: contain;
+    /* Filtro opcional para cambiar color si la imagen es negra/blanca */
+    {% if section.settings.apply_dot_color %}
+      filter: drop-shadow(0 0 0 {{ section.settings.dot_color }});
+    {% endif %}
   }
 
   .node-content-{{ section.id }} {
     position: absolute;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     width: {{ section.settings.node_content_width }}px;
     align-items: {{ section.settings.content_block_align }};
     text-align: {{ section.settings.content_block_align | replace: 'flex-start', 'left' | replace: 'flex-end', 'right' }};
   }
 
-  /* Coordenadas */
+  .node-text-{{ section.id }} {
+    color: {{ section.settings.node_text_color }};
+    font-size: {{ section.settings.node_font_size }}px;
+    font-weight: {{ section.settings.node_font_weight }};
+    text-transform: {{ section.settings.node_text_transform }};
+    line-height: 1.2;
+  }
+
+  /* Posiciones del Reloj */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -69,6 +79,7 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
+  /* Distancia del contenido al punto */
   {%- assign gap = section.settings.node_distance -%}
   .pos-12 .node-content-{{ section.id }} { bottom: {{ gap }}px; left: 50%; transform: translateX(-50%); }
   .pos-2  .node-content-{{ section.id }} { left: {{ gap }}px; top: 0; transform: translateY(-50%); }
@@ -78,7 +89,7 @@
   .pos-10 .node-content-{{ section.id }} { right: {{ gap }}px; top: 0; transform: translateY(-50%); }
 
   @media screen and (max-width: 768px) {
-    .circle-wrapper-{{ section.id }} { transform: scale(0.6); }
+    .circle-wrapper-{{ section.id }} { transform: scale(0.6); padding: 80px 0; }
   }
 {%- endstyle -%}
 
@@ -94,20 +105,26 @@
       {%- for block in section.blocks -%}
         <div class="clock-node-{{ section.id }} pos-{{ block.settings.position }}" {{ block.shopify_attributes }}>
           <div class="node-dot-{{ section.id }}">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="50" r="50" />
-            </svg>
+            {%- if block.settings.dot_image != blank -%}
+              <img src="{{ block.settings.dot_image | image_url: width: 100 }}" alt="Dot">
+            {%- else -%}
+              {%- comment -%} Círculo de respaldo por si no suben imagen {%- endcomment -%}
+              <div
+                style="width:{{ section.settings.dot_size }}px; height:{{ section.settings.dot_size }}px; background:{{ section.settings.dot_color }}; border-radius:50%;"
+              ></div>
+            {%- endif -%}
           </div>
 
           <div class="node-content-{{ section.id }}">
             {%- if block.settings.node_text != blank -%}
               <div
                 class="node-text-{{ section.id }}"
-                style="font-family: {{ section.settings.node_font_family.family }}, sans-serif; color: {{ section.settings.node_text_color }}; font-size: {{ section.settings.node_font_size }}px; font-weight: {{ section.settings.node_font_weight }}; text-transform: {{ section.settings.node_text_transform }};"
+                style="font-family: {{ section.settings.node_font_family.family }}, sans-serif;"
               >
                 {{ block.settings.node_text | escape }}
               </div>
             {%- endif -%}
+
             {%- if block.settings.node_image != blank -%}
               <div class="node-icon-{{ section.id }}">
                 <img
@@ -138,7 +155,8 @@
       "label": "Padding Vertical",
       "default": 100
     },
-    { "type": "image_picker", "id": "circle_image", "label": "Imagen Centro" },
+    { "type": "header", "content": "Círculo Grande" },
+    { "type": "image_picker", "id": "circle_image", "label": "Imagen Producto Centro" },
     {
       "type": "range",
       "id": "circle_size",
@@ -151,19 +169,27 @@
     },
     { "type": "color", "id": "circle_border_color", "label": "Color Línea", "default": "#000000" },
     { "type": "range", "id": "circle_border_width", "min": 1, "max": 10, "label": "Grosor Línea", "default": 1 },
-    { "type": "color", "id": "dot_color", "label": "Color Punto", "default": "#000000" },
-    { "type": "range", "id": "dot_size", "min": 5, "max": 50, "label": "Tamaño Punto", "default": 15 },
+    { "type": "header", "content": "Ajustes de los Puntos (Dots)" },
     {
       "type": "range",
-      "id": "inner_image_width",
-      "min": 10,
-      "max": 150,
-      "unit": "%",
-      "label": "Escala Imagen",
-      "default": 80
+      "id": "dot_size",
+      "min": 5,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del Punto",
+      "default": 20
     },
-    { "type": "range", "id": "circle_margin_top", "min": 0, "max": 200, "label": "Margen Superior", "default": 40 },
-    { "type": "range", "id": "node_distance", "min": 10, "max": 250, "label": "Distancia Texto", "default": 60 },
+    { "type": "color", "id": "dot_color", "label": "Color del Punto (Respaldo)", "default": "#000000" },
+    { "type": "header", "content": "Textos e Iconos" },
+    {
+      "type": "range",
+      "id": "node_distance",
+      "min": 10,
+      "max": 250,
+      "label": "Distancia Texto al Punto",
+      "default": 60
+    },
     {
       "type": "select",
       "id": "content_block_align",
@@ -177,7 +203,7 @@
     },
     { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
     { "type": "font_picker", "id": "node_font_family", "label": "Fuente", "default": "assistant_n4" },
-    { "type": "range", "id": "node_font_size", "min": 10, "max": 40, "label": "Letra", "default": 14 },
+    { "type": "range", "id": "node_font_size", "min": 10, "max": 40, "label": "Tamaño Letra", "default": 14 },
     {
       "type": "select",
       "id": "node_font_weight",
@@ -188,24 +214,22 @@
       ],
       "default": "700"
     },
-    {
-      "type": "select",
-      "id": "node_text_transform",
-      "label": "Mayúsculas",
-      "options": [
-        { "value": "none", "label": "No" },
-        { "value": "uppercase", "label": "Sí" }
-      ],
-      "default": "uppercase"
-    },
     { "type": "range", "id": "node_content_width", "min": 50, "max": 500, "label": "Ancho Bloque", "default": 180 },
-    { "type": "range", "id": "node_icon_width", "min": 10, "max": 200, "label": "Icono", "default": 40 }
+    {
+      "type": "range",
+      "id": "node_icon_width",
+      "min": 10,
+      "max": 200,
+      "label": "Tamaño Icono Beneficio",
+      "default": 40
+    }
   ],
   "blocks": [
     {
       "type": "benefit",
       "name": "Beneficio",
       "settings": [
+        { "type": "image_picker", "id": "dot_image", "label": "Imagen del Punto (Círculo Negro)" },
         {
           "type": "select",
           "id": "position",
@@ -221,7 +245,7 @@
           "default": "12"
         },
         { "type": "text", "id": "node_text", "label": "Texto" },
-        { "type": "image_picker", "id": "node_image", "label": "Icono" }
+        { "type": "image_picker", "id": "node_image", "label": "Icono del Beneficio" }
       ]
     }
   ],
