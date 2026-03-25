@@ -7,22 +7,17 @@
     perspective: 1000px;
   }
 
-  /* --- ANIMACIÓN 3D INFINITA --- */
-  @keyframes floating3D-{{ section.id }} {
+  /* --- ANIMACIÓN 3D ULTRA FLUIDA Y CONTINUA --- */
+  @keyframes smoothFloating3D-{{ section.id }} {
     0% {
-      transform: translate(-50%, -50%) translateZ(50px) rotateX(0deg) rotateY(0deg);
+      transform: translate(-50%, -50%) translateZ(60px) rotateX(0deg) rotateY(0deg);
     }
-    25% {
-      transform: translate(-50%, -55%) translateZ(70px) rotateX(15deg) rotateY(10deg);
-    }
+    /* Un solo punto intermedio suave para guiar el movimiento sin pausas */
     50% {
-      transform: translate(-50%, -50%) translateZ(50px) rotateX(0deg) rotateY(20deg);
-    }
-    75% {
-      transform: translate(-50%, -45%) translateZ(70px) rotateX(-15deg) rotateY(10deg);
+      transform: translate(-50%, -48%) translateZ(80px) rotateX(8deg) rotateY(12deg);
     }
     100% {
-      transform: translate(-50%, -50%) translateZ(50px) rotateX(0deg) rotateY(0deg);
+      transform: translate(-50%, -50%) translateZ(60px) rotateX(0deg) rotateY(0deg);
     }
   }
 
@@ -45,7 +40,7 @@
     transform-style: preserve-3d;
   }
 
-  /* IMAGEN CENTRAL CON ANIMACIÓN AUTOMÁTICA */
+  /* IMAGEN CENTRAL CON MOVIMIENTO CONTINUO */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
@@ -54,8 +49,9 @@
     z-index: 5;
     pointer-events: none;
     transform-style: preserve-3d;
-    /* 6 segundos de duración, suave, infinito */
-    animation: floating3D-{{ section.id }} 6s ease-in-out infinite;
+    /* 10 segundos para un movimiento lento y majestuoso */
+    /* 'linear' asegura velocidad constante sin acelerones ni frenazos */
+    animation: smoothFloating3D-{{ section.id }} 10s linear infinite;
     will-change: transform;
   }
 
