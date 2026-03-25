@@ -36,52 +36,6 @@
       "name": "Hero Video Slider",
       "settings": {}
     },
-    "floating_section_gUpTqX": {
-      "type": "floating-section",
-      "blocks": {
-        "product_item_7chkkC": {
-          "type": "product_item",
-          "settings": {
-            "product_image": "shopify://shop_images/tiras-nasales-9534bea8d32a3fed1317376824655865-1024-1024.webp",
-            "pos_x": 10,
-            "pos_y": 15,
-            "img_width": 300,
-            "scroll_speed": 2,
-            "rotation": 0
-          }
-        },
-        "product_item_8ADBfd": {
-          "type": "product_item",
-          "settings": {
-            "pos_x": 70,
-            "pos_y": 30,
-            "img_width": 300,
-            "scroll_speed": -2,
-            "rotation": 0
-          }
-        },
-        "product_item_GWGd3Q": {
-          "type": "product_item",
-          "settings": {
-            "pos_x": 40,
-            "pos_y": 60,
-            "img_width": 300,
-            "scroll_speed": 4,
-            "rotation": 0
-          }
-        }
-      },
-      "block_order": [
-        "product_item_7chkkC",
-        "product_item_8ADBfd",
-        "product_item_GWGd3Q"
-      ],
-      "name": "Productos Flotantes",
-      "settings": {
-        "title": "THE COLLECTION",
-        "subtitle": "EXPLORE THE UNKNOWN"
-      }
-    },
     "rich_text": {
       "type": "rich-text",
       "blocks": {
@@ -249,7 +203,6 @@
   },
   "order": [
     "hero_banner_q9jUBG",
-    "floating_section_gUpTqX",
     "rich_text",
     "featured_collection",
     "collage",
