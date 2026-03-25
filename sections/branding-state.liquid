@@ -2,20 +2,20 @@
   .brand-statement-{{ section.id }} {
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_v }}px 0;
-    text-align: {{ section.settings.horizontal_alignment }};
+    text-align: center;
     overflow: visible;
   }
 
-  .brand-logo-wrapper-{{ section.id }} {
-    display: flex;
-    justify-content: {% if section.settings.horizontal_alignment == 'left' %}flex-start{% elsif section.settings.horizontal_alignment == 'center' %}center{% else %}flex-end{% endif %};
-    margin-bottom: {{ section.settings.logo_margin_bottom }}px;
+  /* Contenedor Principal del Logo y Texto superior */
+  .brand-header-{{ section.id }} {
+    max-width: {{ section.settings.content_max_width }}px;
+    margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
   }
 
   .brand-logo-{{ section.id }} {
     width: {{ section.settings.logo_width }}px;
     height: auto;
-    display: inline-block;
+    margin-bottom: 20px;
   }
 
   .brand-text-{{ section.id }} {
@@ -25,71 +25,70 @@
     text-transform: {{ section.settings.text_transform }};
     font-style: {{ section.settings.font_style }};
     line-height: 1.2;
-    max-width: {{ section.settings.content_max_width }}px;
-    {% if section.settings.horizontal_alignment == 'center' %}
-      margin: 0 auto;
-    {% elsif section.settings.horizontal_alignment == 'right' %}
-      margin-left: auto;
-    {% endif %}
-    margin-bottom: 40px;
   }
 
-  /* --- SISTEMA DE RELOJ ACTUALIZADO --- */
+  /* --- SISTEMA RELOJ (COMO LA IMAGEN) --- */
+  .circle-wrapper-{{ section.id }} {
+    display: flex;
+    justify-content: center;
+    margin-top: {{ section.settings.circle_margin_top }}px;
+    padding: 100px 0; /* Espacio para que el texto exterior no se corte */
+  }
+
   .circle-container-{{ section.id }} {
     position: relative;
-    display: inline-block;
-    margin-top: {{ section.settings.circle_margin_top }}px;
     width: {{ section.settings.circle_size }}px;
     height: {{ section.settings.circle_size }}px;
-  }
-
-  .brand-circle-{{ section.id }} {
-    width: 100%;
-    height: 100%;
     border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
     background-color: {{ section.settings.circle_bg_color }};
-    position: relative;
-    z-index: 5;
   }
 
-  .brand-circle-{{ section.id }} img {
+  /* Imagen Central Grande */
+  .center-image-{{ section.id }} {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: {{ section.settings.inner_image_width }}%;
-    height: auto;
-    object-fit: contain;
+    z-index: 1;
   }
 
-  /* Nodo posicionado en el borde */
+  .center-image-{{ section.id }} img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Nodos (Punto + Contenido) */
   .clock-node-{{ section.id }} {
     position: absolute;
-    z-index: 10;
-    transform: translate(-50%, -50%);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    z-index: 10;
   }
 
-  /* El circulito decorativo sobre la línea */
+  /* El punto negro justo en la línea */
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px;
     height: {{ section.settings.dot_size }}px;
     background-color: {{ section.settings.dot_color }};
     border-radius: 50%;
-    flex-shrink: 0;
-    z-index: 11;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
-  /* Contenedor de contenido (Texto + Imagen debajo) */
+  /* Contenedor de Texto e Icono (Afuera del círculo) */
   .node-content-{{ section.id }} {
     position: absolute;
-    width: 220px;
+    width: 160px;
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Espacio entre texto e imagen */
+    align-items: center;
+    gap: 10px;
   }
 
   .node-text-{{ section.id }} {
@@ -97,17 +96,15 @@
     font-size: {{ section.settings.node_font_size }}px;
     font-weight: {{ section.settings.node_font_weight }};
     text-transform: {{ section.settings.node_text_transform }};
-    font-style: {{ section.settings.node_font_style }};
-    line-height: 1.1;
+    line-height: 1;
   }
 
-  .node-image-wrap-{{ section.id }} img {
-    max-width: 100px; /* Tamaño ajustable de la imagen del bloque */
+  .node-icon-{{ section.id }} img {
+    max-width: 40px;
     height: auto;
-    display: block;
   }
 
-  /* Coordenadas Reloj */
+  /* POSICIONES EXACTAS (Porcentajes basados en el borde) */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -115,79 +112,77 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
-  /* Alineación de bloque de contenido según la hora */
-  .pos-12 .node-content-{{ section.id }} { bottom: 140%; align-items: center; text-align: center; }
-  .pos-2 .node-content-{{ section.id }}  { left: 140%; align-items: flex-start; text-align: left; }
-  .pos-4 .node-content-{{ section.id }}  { left: 140%; align-items: flex-start; text-align: left; }
-  .pos-6 .node-content-{{ section.id }}  { top: 140%; align-items: center; text-align: center; }
-  .pos-8 .node-content-{{ section.id }}  { right: 140%; align-items: flex-end; text-align: right; }
-  .pos-10 .node-content-{{ section.id }} { right: 140%; align-items: flex-end; text-align: right; }
+  /* ORIENTACIÓN DEL CONTENIDO HACIA AFUERA */
+  .pos-12 .node-content-{{ section.id }} { bottom: 30px; } /* Arriba */
+  .pos-2 .node-content-{{ section.id }}  { left: 30px; align-items: flex-start; text-align: left; }
+  .pos-4 .node-content-{{ section.id }}  { left: 30px; align-items: flex-start; text-align: left; }
+  .pos-6 .node-content-{{ section.id }}  { top: 30px; } /* Abajo */
+  .pos-8 .node-content-{{ section.id }}  { right: 30px; align-items: flex-end; text-align: right; }
+  .pos-10 .node-content-{{ section.id }} { right: 30px; align-items: flex-end; text-align: right; }
 
+  {{ section.settings.font_family | font_face }}
   {{ section.settings.node_font_family | font_face }}
-  .font-node-{{ section.id }} { font-family: {{ section.settings.node_font_family.family }}, sans-serif; }
 
   @media screen and (max-width: 768px) {
-    .circle-container-{{ section.id }} {
-      width: min({{ section.settings.circle_size }}px, 55vw);
-      height: min({{ section.settings.circle_size }}px, 55vw);
-    }
+    .circle-wrapper-{{ section.id }} { transform: scale(0.8); margin-top: 0; }
     .node-content-{{ section.id }} { width: 100px; }
-    .node-text-{{ section.id }} { font-size: 11px; }
   }
 {%- endstyle -%}
 
-<div class="brand-statement-{{ section.id }} font-custom-{{ section.id }}">
+<div class="brand-statement-{{ section.id }}">
   <div class="container mx-auto px-6">
-    {%- if section.settings.logo != blank -%}
-      <div class="brand-logo-wrapper-{{ section.id }}">
-        <img src="{{ section.settings.logo | image_url: width: 1000 }}" class="brand-logo-{{ section.id }}" alt="Logo">
-      </div>
-    {%- endif -%}
+    <div
+      class="brand-header-{{ section.id }}"
+      style="font-family: {{ section.settings.font_family.family }}, sans-serif;"
+    >
+      {%- if section.settings.logo != blank -%}
+        <img src="{{ section.settings.logo | image_url: width: 600 }}" class="brand-logo-{{ section.id }}" alt="Logo">
+      {%- endif -%}
+      {%- if section.settings.content != blank -%}
+        <div class="brand-text-{{ section.id }}">
+          {{ section.settings.content }}
+        </div>
+      {%- endif -%}
+    </div>
 
-    {%- if section.settings.content != blank -%}
-      <div class="brand-text-{{ section.id }}">
-        {{ section.settings.content }}
-      </div>
-    {%- endif -%}
-
-    {%- if section.settings.show_circle -%}
+    <div class="circle-wrapper-{{ section.id }}">
       <div class="circle-container-{{ section.id }}">
-        <div class="brand-circle-{{ section.id }}">
+        <div class="center-image-{{ section.id }}">
           {%- if section.settings.circle_image != blank -%}
-            <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Center">
+            <img src="{{ section.settings.circle_image | image_url: width: 800 }}" alt="Center Product">
           {%- endif -%}
         </div>
 
         {%- for block in section.blocks -%}
-          <div
-            class="clock-node-{{ section.id }} pos-{{ block.settings.position }} font-node-{{ section.id }}"
-            {{ block.shopify_attributes }}
-          >
+          <div class="clock-node-{{ section.id }} pos-{{ block.settings.position }}" {{ block.shopify_attributes }}>
             <div class="node-dot-{{ section.id }}"></div>
 
-            <div class="node-content-{{ section.id }}">
+            <div
+              class="node-content-{{ section.id }}"
+              style="font-family: {{ section.settings.node_font_family.family }}, sans-serif;"
+            >
               {%- if block.settings.node_text != blank -%}
                 <div class="node-text-{{ section.id }}">
-                  {{ block.settings.node_text | newline_to_br }}
+                  {{ block.settings.node_text | escape }}
                 </div>
               {%- endif -%}
 
               {%- if block.settings.node_image != blank -%}
-                <div class="node-image-wrap-{{ section.id }}">
-                  <img src="{{ block.settings.node_image | image_url: width: 300 }}" alt="Icon">
+                <div class="node-icon-{{ section.id }}">
+                  <img src="{{ block.settings.node_image | image_url: width: 150 }}" alt="Icon">
                 </div>
               {%- endif -%}
             </div>
           </div>
         {%- endfor -%}
       </div>
-    {%- endif -%}
+    </div>
   </div>
 </div>
 
 {% schema %}
 {
-  "name": "Brand Statement & Circle",
+  "name": "Brand Circular Feature",
   "settings": [
     { "type": "header", "content": "Sección" },
     { "type": "color", "id": "bg_color", "label": "Fondo Sección", "default": "#ffffff" },
@@ -198,228 +193,171 @@
       "max": 400,
       "step": 10,
       "unit": "px",
-      "label": "Espaciado Vertical",
+      "label": "Padding Vertical",
       "default": 100
     },
-    {
-      "type": "select",
-      "id": "horizontal_alignment",
-      "label": "Alineación",
-      "options": [
-        { "value": "left", "label": "Izquierda" },
-        { "value": "center", "label": "Centro" },
-        { "value": "right", "label": "Derecha" }
-      ],
-      "default": "center"
-    },
 
-    { "type": "header", "content": "Logo" },
-    { "type": "image_picker", "id": "logo", "label": "Imagen Logo" },
+    { "type": "header", "content": "Logo y Texto Superior" },
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
     {
       "type": "range",
       "id": "logo_width",
       "min": 50,
-      "max": 800,
+      "max": 400,
       "step": 10,
       "unit": "px",
       "label": "Ancho Logo",
       "default": 150
+    },
+    { "type": "richtext", "id": "content", "label": "Texto Principal" },
+    { "type": "color", "id": "text_color", "label": "Color Texto", "default": "#000000" },
+    { "type": "font_picker", "id": "font_family", "label": "Fuente Principal", "default": "assistant_n4" },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño Fuente",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 300,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Ancho Máximo",
+      "default": 600
     },
     {
       "type": "range",
       "id": "logo_margin_bottom",
       "min": 0,
       "max": 200,
-      "step": 5,
+      "step": 10,
       "unit": "px",
-      "label": "Margen abajo logo",
-      "default": 40
+      "label": "Margen abajo cabecera",
+      "default": 60
     },
 
-    { "type": "header", "content": "Texto Principal" },
-    { "type": "richtext", "id": "content", "label": "Texto", "default": "<p>Escribe tu <strong>mensaje</strong>.</p>" },
-    { "type": "color", "id": "text_color", "label": "Color Texto", "default": "#000000" },
-    { "type": "font_picker", "id": "font_family", "label": "Fuente", "default": "assistant_n4" },
-    {
-      "type": "range",
-      "id": "font_size",
-      "min": 10,
-      "max": 150,
-      "step": 2,
-      "unit": "px",
-      "label": "Tamaño Letra",
-      "default": 30
-    },
-    {
-      "type": "range",
-      "id": "content_max_width",
-      "min": 300,
-      "max": 2000,
-      "step": 50,
-      "unit": "px",
-      "label": "Ancho Máximo Texto",
-      "default": 900
-    },
-    {
-      "type": "select",
-      "id": "font_weight",
-      "label": "Peso",
-      "options": [
-        { "value": "300", "label": "Light" },
-        { "value": "400", "label": "Normal" },
-        { "value": "700", "label": "Bold" },
-        { "value": "900", "label": "Black" }
-      ],
-      "default": "400"
-    },
-    {
-      "type": "select",
-      "id": "text_transform",
-      "label": "Mayúsculas",
-      "options": [
-        { "value": "none", "label": "No" },
-        { "value": "uppercase", "label": "Sí" }
-      ],
-      "default": "none"
-    },
-    {
-      "type": "select",
-      "id": "font_style",
-      "label": "Estilo",
-      "options": [
-        { "value": "normal", "label": "Normal" },
-        { "value": "italic", "label": "Itálica" }
-      ],
-      "default": "normal"
-    },
-
-    { "type": "header", "content": "Círculo Central" },
-    { "type": "checkbox", "id": "show_circle", "label": "Mostrar Círculo", "default": true },
+    { "type": "header", "content": "Círculo de Producto" },
+    { "type": "image_picker", "id": "circle_image", "label": "Imagen del Producto (Centro)" },
     {
       "type": "range",
       "id": "circle_size",
-      "min": 100,
+      "min": 200,
       "max": 800,
-      "step": 10,
+      "step": 20,
       "unit": "px",
-      "label": "Tamaño Círculo",
+      "label": "Diámetro Círculo",
       "default": 400
     },
+    { "type": "color", "id": "circle_border_color", "label": "Color Línea Círculo", "default": "#e0e0e0" },
     {
       "type": "range",
       "id": "circle_border_width",
-      "min": 0,
-      "max": 60,
+      "min": 1,
+      "max": 10,
       "step": 1,
       "unit": "px",
-      "label": "Grosor Borde",
-      "default": 2
+      "label": "Grosor Línea",
+      "default": 1
     },
-    { "type": "color", "id": "circle_border_color", "label": "Color Borde", "default": "#000000" },
-    { "type": "color", "id": "circle_bg_color", "label": "Color Relleno", "default": "transparent" },
-    {
-      "type": "range",
-      "id": "circle_margin_top",
-      "min": 0,
-      "max": 300,
-      "step": 10,
-      "unit": "px",
-      "label": "Margen arriba círculo",
-      "default": 80
-    },
-    { "type": "image_picker", "id": "circle_image", "label": "Imagen interna" },
+    { "type": "color", "id": "circle_bg_color", "label": "Fondo Círculo", "default": "transparent" },
     {
       "type": "range",
       "id": "inner_image_width",
       "min": 10,
-      "max": 100,
+      "max": 120,
       "step": 5,
       "unit": "%",
-      "label": "Tamaño Imagen Interna",
-      "default": 70
+      "label": "Escala Imagen Producto",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "circle_margin_top",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Margen Superior",
+      "default": 40
     },
 
-    { "type": "header", "content": "Estilo de los Puntos Horarios" },
-    { "type": "color", "id": "dot_color", "label": "Color del Punto Decorativo", "default": "#000000" },
+    { "type": "header", "content": "Estilo de los Beneficios (Puntos)" },
+    { "type": "color", "id": "dot_color", "label": "Color del Punto", "default": "#000000" },
     {
       "type": "range",
       "id": "dot_size",
-      "min": 5,
-      "max": 80,
-      "step": 5,
+      "min": 4,
+      "max": 30,
+      "step": 2,
       "unit": "px",
-      "label": "Tamaño del Punto",
-      "default": 15
+      "label": "Tamaño Punto",
+      "default": 10
     },
-    { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
-    { "type": "font_picker", "id": "node_font_family", "label": "Fuente Texto", "default": "assistant_n4" },
+    { "type": "color", "id": "node_text_color", "label": "Color Texto Beneficio", "default": "#000000" },
+    { "type": "font_picker", "id": "node_font_family", "label": "Fuente Beneficios", "default": "assistant_n4" },
     {
       "type": "range",
       "id": "node_font_size",
       "min": 8,
-      "max": 60,
+      "max": 40,
       "step": 1,
       "unit": "px",
-      "label": "Tamaño Texto",
-      "default": 16
+      "label": "Tamaño Texto Beneficio",
+      "default": 14
     },
     {
       "type": "select",
       "id": "node_font_weight",
       "label": "Peso Texto",
       "options": [
-        { "value": "300", "label": "Light" },
         { "value": "400", "label": "Normal" },
         { "value": "700", "label": "Bold" },
         { "value": "900", "label": "Black" }
       ],
-      "default": "400"
+      "default": "700"
     },
     {
       "type": "select",
       "id": "node_text_transform",
-      "label": "Mayúsculas",
+      "label": "Transformación",
       "options": [
-        { "value": "none", "label": "No" },
-        { "value": "uppercase", "label": "Sí" }
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "MAYÚSCULAS" }
       ],
-      "default": "none"
-    },
-    {
-      "type": "select",
-      "id": "node_font_style",
-      "label": "Estilo",
-      "options": [
-        { "value": "normal", "label": "Normal" },
-        { "value": "italic", "label": "Itálica" }
-      ],
-      "default": "normal"
+      "default": "uppercase"
     }
   ],
   "blocks": [
     {
-      "type": "point",
-      "name": "Punto (Hora)",
+      "type": "benefit",
+      "name": "Beneficio",
       "settings": [
         {
           "type": "select",
           "id": "position",
-          "label": "Seleccionar Hora",
+          "label": "Posición (Hora)",
           "options": [
-            { "value": "12", "label": "12:00" },
+            { "value": "12", "label": "12:00 (Arriba)" },
             { "value": "2", "label": "02:00" },
             { "value": "4", "label": "04:00" },
-            { "value": "6", "label": "06:00" },
+            { "value": "6", "label": "06:00 (Abajo)" },
             { "value": "8", "label": "08:00" },
             { "value": "10", "label": "10:00" }
           ],
           "default": "12"
         },
-        { "type": "textarea", "id": "node_text", "label": "Texto" },
-        { "type": "image_picker", "id": "node_image", "label": "Imagen (Sale debajo del texto)" }
+        { "type": "text", "id": "node_text", "label": "Texto del Beneficio" },
+        { "type": "image_picker", "id": "node_image", "label": "Icono (Debajo del texto)" }
       ]
     }
   ],
-  "presets": [{ "name": "Brand Statement & Circle" }]
+  "presets": [{ "name": "Brand Circular Feature" }]
 }
 {% endschema %}
