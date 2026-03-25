@@ -3,6 +3,7 @@
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_v }}px 0;
     text-align: {{ section.settings.horizontal_alignment }};
+    overflow: hidden; /* Previene desbordamiento si el círculo es gigante */
   }
 
   .brand-logo-wrapper-{{ section.id }} {
@@ -14,6 +15,7 @@
   .brand-logo-{{ section.id }} {
     width: {{ section.settings.logo_width }}px;
     height: auto;
+    display: block;
   }
 
   .brand-text-{{ section.id }} {
@@ -36,6 +38,7 @@
     display: flex;
     justify-content: {% if section.settings.horizontal_alignment == 'left' %}flex-start{% elsif section.settings.horizontal_alignment == 'center' %}center{% else %}flex-end{% endif %};
     margin-top: {{ section.settings.circle_margin_top }}px;
+    width: 100%;
   }
 
   .brand-circle-{{ section.id }} {
@@ -49,12 +52,15 @@
     overflow: hidden;
     position: relative;
     background-color: {{ section.settings.circle_bg_color }};
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* Evita que se aplaste en contenedores flex */
   }
 
   .brand-circle-{{ section.id }} img {
     width: {{ section.settings.inner_image_width }}%;
     height: auto;
     object-fit: contain;
+    max-width: 100%; /* Asegura que la imagen no se salga si el % es alto */
   }
 
   /* Tipografía */
@@ -63,10 +69,22 @@
     font-family: {{ section.settings.font_family.family }}, {{ section.settings.font_family.fallback_families }};
   }
 
+  .brand-text-{{ section.id }} strong {
+    font-weight: 900;
+  }
+
   @media screen and (max-width: 768px) {
+    .brand-text-{{ section.id }} {
+      font-size: clamp(16px, 5vw, {{ section.settings.font_size }}px);
+      padding: 0 20px;
+    }
+    .brand-logo-{{ section.id }} {
+      width: clamp(50px, 30vw, {{ section.settings.logo_width }}px);
+    }
+    /* Ajuste para que el círculo no desborde en móvil */
     .brand-circle-{{ section.id }} {
-      width: {{ section.settings.circle_size | times: 0.7 }}px;
-      height: {{ section.settings.circle_size | times: 0.7 }}px;
+      max-width: 90vw;
+      max-height: 90vw;
     }
   }
 {%- endstyle -%}
@@ -97,7 +115,7 @@
       <div class="circle-container-{{ section.id }}">
         <div class="brand-circle-{{ section.id }}">
           {%- if section.settings.circle_image != blank -%}
-            <img src="{{ section.settings.circle_image | image_url: width: 400 }}" alt="Circle Image" loading="lazy">
+            <img src="{{ section.settings.circle_image | image_url: width: 800 }}" alt="Circle Image" loading="lazy">
           {%- endif -%}
         </div>
       </div>
@@ -115,8 +133,8 @@
       "type": "range",
       "id": "padding_v",
       "min": 0,
-      "max": 200,
-      "step": 5,
+      "max": 300,
+      "step": 10,
       "unit": "px",
       "label": "Espaciado Vertical",
       "default": 80
@@ -139,7 +157,7 @@
       "type": "range",
       "id": "logo_width",
       "min": 30,
-      "max": 600,
+      "max": 1000,
       "step": 10,
       "unit": "px",
       "label": "Ancho",
@@ -149,8 +167,8 @@
       "type": "range",
       "id": "logo_margin_bottom",
       "min": 0,
-      "max": 100,
-      "step": 5,
+      "max": 200,
+      "step": 10,
       "unit": "px",
       "label": "Margen Inferior",
       "default": 30
@@ -169,7 +187,7 @@
       "type": "range",
       "id": "font_size",
       "min": 12,
-      "max": 100,
+      "max": 150,
       "step": 1,
       "unit": "px",
       "label": "Tamaño",
@@ -179,7 +197,7 @@
       "type": "range",
       "id": "content_max_width",
       "min": 400,
-      "max": 1400,
+      "max": 2000,
       "step": 50,
       "unit": "px",
       "label": "Ancho Máximo del Texto",
@@ -224,34 +242,39 @@
       "type": "range",
       "id": "circle_border_width",
       "min": 1,
-      "max": 20,
+      "max": 50,
       "step": 1,
       "unit": "px",
       "label": "Grosor del Borde",
       "default": 2
     },
     { "type": "color", "id": "circle_bg_color", "label": "Fondo del Círculo (Relleno)", "default": "transparent" },
+
+    /* CAMBIO CLAVE: Aumentado el tamaño máximo del círculo */
     {
       "type": "range",
       "id": "circle_size",
       "min": 50,
-      "max": 400,
+      "max": 1000,
       "step": 10,
       "unit": "px",
       "label": "Tamaño del Círculo",
       "default": 120
     },
+
     {
       "type": "range",
       "id": "circle_margin_top",
       "min": 0,
-      "max": 100,
-      "step": 5,
+      "max": 200,
+      "step": 10,
       "unit": "px",
       "label": "Margen Superior",
       "default": 40
     },
     { "type": "image_picker", "id": "circle_image", "label": "Imagen dentro del círculo" },
+
+    /* CAMBIO CLAVE: Permitir que la imagen ocupe el 100% del círculo */
     {
       "type": "range",
       "id": "inner_image_width",
