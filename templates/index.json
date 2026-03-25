@@ -34,7 +34,11 @@
         "slide_Vw3zeC"
       ],
       "name": "Hero Video Slider",
-      "settings": {}
+      "settings": {
+        "height_mode": "custom",
+        "custom_height": 650,
+        "mobile_height": 500
+      }
     },
     "separator_pKKz3L": {
       "type": "separator",
