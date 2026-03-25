@@ -6,7 +6,6 @@
     overflow: visible;
   }
 
-  /* Contenedor Principal del Logo y Texto superior */
   .brand-header-{{ section.id }} {
     max-width: {{ section.settings.content_max_width }}px;
     margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
@@ -16,6 +15,7 @@
     width: {{ section.settings.logo_width }}px;
     height: auto;
     margin-bottom: 20px;
+    display: inline-block;
   }
 
   .brand-text-{{ section.id }} {
@@ -27,12 +27,12 @@
     line-height: 1.2;
   }
 
-  /* --- SISTEMA RELOJ (COMO LA IMAGEN) --- */
+  /* --- SISTEMA RELOJ --- */
   .circle-wrapper-{{ section.id }} {
     display: flex;
     justify-content: center;
     margin-top: {{ section.settings.circle_margin_top }}px;
-    padding: 100px 0; /* Espacio para que el texto exterior no se corte */
+    padding: 120px 0; /* Espacio para que el contenido no se corte */
   }
 
   .circle-container-{{ section.id }} {
@@ -44,7 +44,6 @@
     background-color: {{ section.settings.circle_bg_color }};
   }
 
-  /* Imagen Central Grande */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
@@ -52,6 +51,7 @@
     transform: translate(-50%, -50%);
     width: {{ section.settings.inner_image_width }}%;
     z-index: 1;
+    pointer-events: none;
   }
 
   .center-image-{{ section.id }} img {
@@ -60,35 +60,32 @@
     display: block;
   }
 
-  /* Nodos (Punto + Contenido) */
+  /* Nodos */
   .clock-node-{{ section.id }} {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 0;
+    height: 0;
     z-index: 10;
   }
 
-  /* El punto negro justo en la línea */
+  /* El Punto Negro (Ahora visible sobre todo) */
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px;
     height: {{ section.settings.dot_size }}px;
     background-color: {{ section.settings.dot_color }};
     border-radius: 50%;
     position: absolute;
-    top: 50%;
-    left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 20;
   }
 
-  /* Contenedor de Texto e Icono (Afuera del círculo) */
+  /* Contenedor de Texto e Imagen */
   .node-content-{{ section.id }} {
     position: absolute;
-    width: 160px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 10px;
+    width: {{ section.settings.node_content_width }}px; /* Control de ancho de texto */
   }
 
   .node-text-{{ section.id }} {
@@ -96,15 +93,17 @@
     font-size: {{ section.settings.node_font_size }}px;
     font-weight: {{ section.settings.node_font_weight }};
     text-transform: {{ section.settings.node_text_transform }};
-    line-height: 1;
+    font-style: {{ section.settings.node_font_style }};
+    line-height: 1.1;
   }
 
   .node-icon-{{ section.id }} img {
-    max-width: 40px;
+    width: {{ section.settings.node_icon_width }}px; /* Control de tamaño de imagen */
     height: auto;
+    display: inline-block;
   }
 
-  /* POSICIONES EXACTAS (Porcentajes basados en el borde) */
+  /* Coordenadas */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -112,20 +111,20 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
-  /* ORIENTACIÓN DEL CONTENIDO HACIA AFUERA */
-  .pos-12 .node-content-{{ section.id }} { bottom: 30px; } /* Arriba */
-  .pos-2 .node-content-{{ section.id }}  { left: 30px; align-items: flex-start; text-align: left; }
-  .pos-4 .node-content-{{ section.id }}  { left: 30px; align-items: flex-start; text-align: left; }
-  .pos-6 .node-content-{{ section.id }}  { top: 30px; } /* Abajo */
-  .pos-8 .node-content-{{ section.id }}  { right: 30px; align-items: flex-end; text-align: right; }
-  .pos-10 .node-content-{{ section.id }} { right: 30px; align-items: flex-end; text-align: right; }
+  /* Ajuste de dirección del contenido */
+  .pos-12 .node-content-{{ section.id }} { bottom: 25px; left: 50%; transform: translateX(-50%); align-items: center; text-align: center; }
+  .pos-2 .node-content-{{ section.id }}  { left: 25px; top: 0; transform: translateY(-50%); align-items: flex-start; text-align: left; }
+  .pos-4 .node-content-{{ section.id }}  { left: 25px; bottom: 0; transform: translateY(50%); align-items: flex-start; text-align: left; }
+  .pos-6 .node-content-{{ section.id }}  { top: 25px; left: 50%; transform: translateX(-50%); align-items: center; text-align: center; }
+  .pos-8 .node-content-{{ section.id }}  { right: 25px; bottom: 0; transform: translateY(50%); align-items: flex-end; text-align: right; }
+  .pos-10 .node-content-{{ section.id }} { right: 25px; top: 0; transform: translateY(-50%); align-items: flex-end; text-align: right; }
 
   {{ section.settings.font_family | font_face }}
   {{ section.settings.node_font_family | font_face }}
 
   @media screen and (max-width: 768px) {
-    .circle-wrapper-{{ section.id }} { transform: scale(0.8); margin-top: 0; }
-    .node-content-{{ section.id }} { width: 100px; }
+    .circle-wrapper-{{ section.id }} { transform: scale(0.7); padding: 50px 0; }
+    .node-content-{{ section.id }} { width: 120px !important; }
   }
 {%- endstyle -%}
 
@@ -149,7 +148,7 @@
       <div class="circle-container-{{ section.id }}">
         <div class="center-image-{{ section.id }}">
           {%- if section.settings.circle_image != blank -%}
-            <img src="{{ section.settings.circle_image | image_url: width: 800 }}" alt="Center Product">
+            <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Center Product">
           {%- endif -%}
         </div>
 
@@ -169,7 +168,7 @@
 
               {%- if block.settings.node_image != blank -%}
                 <div class="node-icon-{{ section.id }}">
-                  <img src="{{ block.settings.node_image | image_url: width: 150 }}" alt="Icon">
+                  <img src="{{ block.settings.node_image | image_url: width: 300 }}" alt="Icon">
                 </div>
               {%- endif -%}
             </div>
@@ -271,7 +270,7 @@
       "type": "range",
       "id": "inner_image_width",
       "min": 10,
-      "max": 120,
+      "max": 150,
       "step": 5,
       "unit": "%",
       "label": "Escala Imagen Producto",
@@ -294,22 +293,22 @@
       "type": "range",
       "id": "dot_size",
       "min": 4,
-      "max": 30,
+      "max": 40,
       "step": 2,
       "unit": "px",
       "label": "Tamaño Punto",
-      "default": 10
+      "default": 12
     },
-    { "type": "color", "id": "node_text_color", "label": "Color Texto Beneficio", "default": "#000000" },
+    { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
     { "type": "font_picker", "id": "node_font_family", "label": "Fuente Beneficios", "default": "assistant_n4" },
     {
       "type": "range",
       "id": "node_font_size",
       "min": 8,
-      "max": 40,
+      "max": 50,
       "step": 1,
       "unit": "px",
-      "label": "Tamaño Texto Beneficio",
+      "label": "Tamaño Fuente",
       "default": 14
     },
     {
@@ -332,6 +331,36 @@
         { "value": "uppercase", "label": "MAYÚSCULAS" }
       ],
       "default": "uppercase"
+    },
+    {
+      "type": "select",
+      "id": "node_font_style",
+      "label": "Estilo",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "italic", "label": "Itálica" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "node_content_width",
+      "min": 50,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho del Texto",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "node_icon_width",
+      "min": 10,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Tamaño Icono/Imagen",
+      "default": 40
     }
   ],
   "blocks": [
@@ -344,17 +373,17 @@
           "id": "position",
           "label": "Posición (Hora)",
           "options": [
-            { "value": "12", "label": "12:00 (Arriba)" },
+            { "value": "12", "label": "12:00" },
             { "value": "2", "label": "02:00" },
             { "value": "4", "label": "04:00" },
-            { "value": "6", "label": "06:00 (Abajo)" },
+            { "value": "6", "label": "06:00" },
             { "value": "8", "label": "08:00" },
             { "value": "10", "label": "10:00" }
           ],
           "default": "12"
         },
         { "type": "text", "id": "node_text", "label": "Texto del Beneficio" },
-        { "type": "image_picker", "id": "node_image", "label": "Icono (Debajo del texto)" }
+        { "type": "image_picker", "id": "node_image", "label": "Icono/Imagen" }
       ]
     }
   ],
