@@ -4,8 +4,8 @@
     padding: {{ section.settings.padding_v }}px 0;
     text-align: center;
     overflow: visible;
-    /* Perspectiva para el efecto 3D */
-    perspective: 1200px;
+    /* Perspectiva aumentada para un efecto 3D más dramático */
+    perspective: 800px;
   }
 
   .brand-header-{{ section.id }} {
@@ -28,13 +28,6 @@
     line-height: 1.2;
   }
 
-  /* Animación de flotación constante */
-  @keyframes float-product {
-    0% { transform: translate(-50%, -52%); }
-    50% { transform: translate(-50%, -48%); }
-    100% { transform: translate(-50%, -52%); }
-  }
-
   .circle-wrapper-{{ section.id }} {
     display: flex;
     justify-content: center;
@@ -52,16 +45,18 @@
     background-color: {{ section.settings.circle_bg_color }};
   }
 
-  /* IMAGEN CENTRAL 3D */
+  /* IMAGEN CENTRAL 3D INTENSIFICADA */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    /* Estado inicial: centrado y escala normal */
+    transform: translate(-50%, -50%) scale(1);
     width: {{ section.settings.inner_image_width }}%;
     z-index: 1;
     pointer-events: none;
-    transition: transform 0.15s ease-out;
+    /* Transición más rápida para respuesta inmediata */
+    transition: transform 0.1s ease-out;
     transform-style: preserve-3d;
     will-change: transform;
   }
@@ -70,16 +65,12 @@
     width: 100%;
     height: auto;
     display: block;
-    filter: drop-shadow(0 30px 40px rgba(0,0,0,0.2));
+    /* Sombra más pronunciada para mayor profundidad */
+    filter: drop-shadow(0 40px 50px rgba(0,0,0,0.3));
   }
 
-  /* Nodos */
-  .clock-node-{{ section.id }} {
-    position: absolute;
-    width: 0;
-    height: 0;
-    z-index: 10;
-  }
+  /* Nodos y Beneficios */
+  .clock-node-{{ section.id }} { position: absolute; width: 0; height: 0; z-index: 10; }
 
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px !important;
@@ -195,17 +186,21 @@
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      const rotateX = ((y - centerY) / centerY) * -12; // Sensibilidad X
-      const rotateY = ((x - centerX) / centerX) * 12; // Sensibilidad Y
+      // --- AJUSTES DE INTENSIDAD ---
+      // Aumentamos el multiplicador a 25 (antes 12) para que rote más.
+      const rotateX = ((y - centerY) / centerY) * -25;
+      const rotateY = ((x - centerX) / centerX) * 25;
 
-      image.style.transform = `translate(-50%, -50%) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      // Añadimos un ligero escalado (scale(1.05)) al mover el mouse
+      image.style.transform = `translate(-50%, -50%) scale(1.05) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
 
     container.addEventListener('mouseleave', () => {
       image.style.transition = 'transform 0.6s ease';
-      image.style.transform = `translate(-50%, -50%) rotateX(0deg) rotateY(0deg)`;
+      // Reseteamos rotación y escala a normal
+      image.style.transform = `translate(-50%, -50%) scale(1) rotateX(0deg) rotateY(0deg)`;
       setTimeout(() => {
-        image.style.transition = 'transform 0.15s ease-out';
+        image.style.transition = 'transform 0.1s ease-out';
       }, 600);
     });
   });
