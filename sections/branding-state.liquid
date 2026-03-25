@@ -23,7 +23,6 @@
     font-size: {{ section.settings.font_size }}px;
     font-weight: {{ section.settings.font_weight }};
     text-transform: {{ section.settings.text_transform }};
-    font-style: {{ section.settings.font_style }};
     line-height: 1.2;
   }
 
@@ -32,7 +31,8 @@
     display: flex;
     justify-content: center;
     margin-top: {{ section.settings.circle_margin_top }}px;
-    padding: 150px 0; /* Aumentado para dar aire al alejamiento */
+    padding: 150px 0;
+    position: relative;
   }
 
   .circle-container-{{ section.id }} {
@@ -68,15 +68,18 @@
     z-index: 10;
   }
 
-  /* El Punto Negro */
+  /* EL PUNTO: Forzado para que no se oculte */
   .node-dot-{{ section.id }} {
-    width: {{ section.settings.dot_size }}px;
-    height: {{ section.settings.dot_size }}px;
-    background-color: {{ section.settings.dot_color }};
-    border-radius: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    z-index: 20;
+    width: {{ section.settings.dot_size }}px !important;
+    height: {{ section.settings.dot_size }}px !important;
+    background-color: {{ section.settings.dot_color }} !important;
+    border-radius: 50% !important;
+    position: absolute !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 20 !important;
+    display: block !important; /* Salta la regla de display:none */
+    line-height: 0;
+    font-size: 0;
   }
 
   /* Contenedor de Contenido */
@@ -95,7 +98,6 @@
     font-size: {{ section.settings.node_font_size }}px;
     font-weight: {{ section.settings.node_font_weight }};
     text-transform: {{ section.settings.node_text_transform }};
-    font-style: {{ section.settings.node_font_style }};
     line-height: 1.1;
     width: 100%;
   }
@@ -114,18 +116,13 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
-  /* --- SEPARACIÓN DINÁMICA --- */
   {%- assign dist = section.settings.node_distance -%}
-
   .pos-12 .node-content-{{ section.id }} { bottom: {{ dist }}px; left: 50%; transform: translateX(-50%); }
-  .pos-2 .node-content-{{ section.id }}  { left: {{ dist }}px; top: 0; transform: translateY(-50%); }
-  .pos-4 .node-content-{{ section.id }}  { left: {{ dist }}px; bottom: 0; transform: translateY(50%); }
-  .pos-6 .node-content-{{ section.id }}  { top: {{ dist }}px; left: 50%; transform: translateX(-50%); }
-  .pos-8 .node-content-{{ section.id }}  { right: {{ dist }}px; bottom: 0; transform: translateY(50%); }
+  .pos-2  .node-content-{{ section.id }} { left: {{ dist }}px; top: 0; transform: translateY(-50%); }
+  .pos-4  .node-content-{{ section.id }} { left: {{ dist }}px; bottom: 0; transform: translateY(50%); }
+  .pos-6  .node-content-{{ section.id }} { top: {{ dist }}px; left: 50%; transform: translateX(-50%); }
+  .pos-8  .node-content-{{ section.id }} { right: {{ dist }}px; bottom: 0; transform: translateY(50%); }
   .pos-10 .node-content-{{ section.id }} { right: {{ dist }}px; top: 0; transform: translateY(-50%); }
-
-  {{ section.settings.font_family | font_face }}
-  {{ section.settings.node_font_family | font_face }}
 
   @media screen and (max-width: 768px) {
     .circle-wrapper-{{ section.id }} { transform: scale(0.65); padding: 40px 0; }
@@ -159,7 +156,7 @@
 
         {%- for block in section.blocks -%}
           <div class="clock-node-{{ section.id }} pos-{{ block.settings.position }}" {{ block.shopify_attributes }}>
-            <div class="node-dot-{{ section.id }}"></div>
+            <div class="node-dot-{{ section.id }}">&nbsp;</div>
 
             <div
               class="node-content-{{ section.id }}"
@@ -305,7 +302,7 @@
     {
       "type": "select",
       "id": "content_block_align",
-      "label": "Alineación Horizontal del Contenido",
+      "label": "Alineación Horizontal",
       "options": [
         { "value": "flex-start", "label": "Izquierda" },
         { "value": "center", "label": "Centro" },
