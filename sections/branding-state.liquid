@@ -3,7 +3,7 @@
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_v }}px 0;
     text-align: {{ section.settings.horizontal_alignment }};
-    overflow: hidden;
+    overflow: visible; /* Cambiado a visible para que los textos del reloj no se corten */
   }
 
   .brand-logo-wrapper-{{ section.id }} {
@@ -37,17 +37,18 @@
     font-weight: 900;
   }
 
-  /* Círculo con rango extendido */
+  /* --- LÓGICA DEL SISTEMA DE RELOJ --- */
   .circle-container-{{ section.id }} {
-    display: flex;
-    justify-content: {% if section.settings.horizontal_alignment == 'left' %}flex-start{% elsif section.settings.horizontal_alignment == 'center' %}center{% else %}flex-end{% endif %};
+    position: relative;
+    display: inline-block; /* Importante para que los puntos orbiten correctamente */
     margin-top: {{ section.settings.circle_margin_top }}px;
-    width: 100%;
+    width: {{ section.settings.circle_size }}px;
+    height: {{ section.settings.circle_size }}px;
   }
 
   .brand-circle-{{ section.id }} {
-    width: {{ section.settings.circle_size }}px;
-    height: {{ section.settings.circle_size }}px;
+    width: 100%;
+    height: 100%;
     border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
     border-radius: 50%;
     display: flex;
@@ -55,7 +56,8 @@
     justify-content: center;
     overflow: hidden;
     background-color: {{ section.settings.circle_bg_color }};
-    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
   }
 
   .brand-circle-{{ section.id }} img {
@@ -64,20 +66,72 @@
     object-fit: contain;
   }
 
-  /* Tipografía */
-  {{ section.settings.font_family | font_face }}
-  .font-custom-{{ section.id }} {
-    font-family: {{ section.settings.font_family.family }}, {{ section.settings.font_family.fallback_families }};
+  /* Puntos del Reloj */
+  .clock-node-{{ section.id }} {
+    position: absolute;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
+  .node-dot-{{ section.id }} {
+    width: {{ section.settings.dot_size }}px;
+    height: {{ section.settings.dot_size }}px;
+    background-color: {{ section.settings.dot_color }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .node-dot-{{ section.id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .node-text-{{ section.id }} {
+    position: absolute;
+    width: 150px; /* Ancho para evitar que el texto se rompa feo */
+    color: {{ section.settings.node_text_color }};
+    font-size: {{ section.settings.node_font_size }}px;
+    font-weight: {{ section.settings.node_font_weight }};
+    text-transform: {{ section.settings.node_text_transform }};
+    font-style: {{ section.settings.node_font_style }};
+    line-height: 1;
+  }
+
+  /* Coordenadas tipo Reloj */
+  .pos-12 { top: 0%; left: 50%; }
+  .pos-2  { top: 25%; left: 93.3%; }
+  .pos-4  { top: 75%; left: 93.3%; }
+  .pos-6  { top: 100%; left: 50%; }
+  .pos-8  { top: 75%; left: 6.7%; }
+  .pos-10 { top: 25%; left: 6.7%; }
+
+  /* Ajuste de dirección del texto según la hora */
+  .pos-12 .node-text-{{ section.id }} { bottom: 120%; text-align: center; }
+  .pos-2 .node-text-{{ section.id }}  { left: 120%; text-align: left; }
+  .pos-4 .node-text-{{ section.id }}  { left: 120%; text-align: left; }
+  .pos-6 .node-text-{{ section.id }}  { top: 120%; text-align: center; }
+  .pos-8 .node-text-{{ section.id }}  { right: 120%; text-align: right; }
+  .pos-10 .node-text-{{ section.id }} { right: 120%; text-align: right; }
+
+  /* Tipografía */
+  {{ section.settings.font_family | font_face }}
+  {{ section.settings.node_font_family | font_face }}
+  .font-custom-{{ section.id }} { font-family: {{ section.settings.font_family.family }}, sans-serif; }
+  .font-node-{{ section.id }} { font-family: {{ section.settings.node_font_family.family }}, sans-serif; }
+
   @media screen and (max-width: 768px) {
-    .brand-circle-{{ section.id }} {
-      width: min({{ section.settings.circle_size }}px, 90vw);
-      height: min({{ section.settings.circle_size }}px, 90vw);
+    .circle-container-{{ section.id }} {
+      width: min({{ section.settings.circle_size }}px, 70vw);
+      height: min({{ section.settings.circle_size }}px, 70vw);
     }
-    .brand-text-{{ section.id }} {
-      font-size: clamp(18px, 6vw, {{ section.settings.font_size }}px);
-    }
+    .node-text-{{ section.id }} { width: 80px; font-size: 10px; }
   }
 {%- endstyle -%}
 
@@ -107,6 +161,24 @@
             <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Circle Image" loading="lazy">
           {%- endif -%}
         </div>
+
+        {%- for block in section.blocks -%}
+          <div
+            class="clock-node-{{ section.id }} pos-{{ block.settings.position }} font-node-{{ section.id }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="node-dot-{{ section.id }}">
+              {%- if block.settings.node_image != blank -%}
+                <img src="{{ block.settings.node_image | image_url: width: 200 }}" alt="Icon" loading="lazy">
+              {%- endif -%}
+            </div>
+            {%- if block.settings.node_text != blank -%}
+              <div class="node-text-{{ section.id }}">
+                {{ block.settings.node_text }}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
       </div>
     {%- endif -%}
   </div>
@@ -163,7 +235,7 @@
       "default": 40
     },
 
-    { "type": "header", "content": "Texto" },
+    { "type": "header", "content": "Texto Principal" },
     { "type": "richtext", "id": "content", "label": "Texto", "default": "<p>Escribe tu <strong>mensaje</strong>.</p>" },
     { "type": "color", "id": "text_color", "label": "Color Texto", "default": "#000000" },
     { "type": "font_picker", "id": "font_family", "label": "Fuente", "default": "assistant_n4" },
@@ -220,7 +292,7 @@
       "default": "normal"
     },
 
-    { "type": "header", "content": "Círculo (Nuevos Rangos)" },
+    { "type": "header", "content": "Círculo Central" },
     { "type": "checkbox", "id": "show_circle", "label": "Mostrar Círculo", "default": true },
     {
       "type": "range",
@@ -229,7 +301,7 @@
       "max": 800,
       "step": 10,
       "unit": "px",
-      "label": "TAMAÑO CÍRCULO",
+      "label": "Tamaño Círculo",
       "default": 300
     },
     {
@@ -264,6 +336,86 @@
       "unit": "%",
       "label": "Tamaño Imagen Interna",
       "default": 70
+    },
+
+    { "type": "header", "content": "Ajustes de Puntos del Reloj" },
+    { "type": "color", "id": "dot_color", "label": "Color de los Puntos", "default": "#000000" },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Tamaño de los Puntos",
+      "default": 20
+    },
+    { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
+    { "type": "font_picker", "id": "node_font_family", "label": "Fuente Puntos", "default": "assistant_n4" },
+    {
+      "type": "range",
+      "id": "node_font_size",
+      "min": 8,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño Texto",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "node_font_weight",
+      "label": "Peso Texto",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "node_text_transform",
+      "label": "Mayúsculas",
+      "options": [
+        { "value": "none", "label": "No" },
+        { "value": "uppercase", "label": "Sí" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "node_font_style",
+      "label": "Estilo",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "italic", "label": "Itálica" }
+      ],
+      "default": "normal"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Punto (Hora)",
+      "settings": [
+        {
+          "type": "select",
+          "id": "position",
+          "label": "Posición (Reloj)",
+          "options": [
+            { "value": "12", "label": "12:00" },
+            { "value": "2", "label": "02:00" },
+            { "value": "4", "label": "04:00" },
+            { "value": "6", "label": "06:00" },
+            { "value": "8", "label": "08:00" },
+            { "value": "10", "label": "10:00" }
+          ],
+          "default": "12"
+        },
+        { "type": "textarea", "id": "node_text", "label": "Texto del punto" },
+        { "type": "image_picker", "id": "node_image", "label": "Imagen del punto (opcional)" }
+      ]
     }
   ],
   "presets": [{ "name": "Brand Statement & Circle" }]
