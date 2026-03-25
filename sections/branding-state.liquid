@@ -14,7 +14,6 @@
   .brand-logo-{{ section.id }} {
     width: {{ section.settings.logo_width }}px;
     height: auto;
-    display: block;
   }
 
   .brand-text-{{ section.id }} {
@@ -32,29 +31,49 @@
     {% endif %}
   }
 
-  /* Tipografía Personalizada */
+  /* Estilos del Círculo Decorativo */
+  .circle-container-{{ section.id }} {
+    display: flex;
+    justify-content: {% if section.settings.horizontal_alignment == 'left' %}flex-start{% elsif section.settings.horizontal_alignment == 'center' %}center{% else %}flex-end{% endif %};
+    margin-top: {{ section.settings.circle_margin_top }}px;
+  }
+
+  .brand-circle-{{ section.id }} {
+    width: {{ section.settings.circle_size }}px;
+    height: {{ section.settings.circle_size }}px;
+    border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    background-color: {{ section.settings.circle_bg_color }};
+  }
+
+  .brand-circle-{{ section.id }} img {
+    width: {{ section.settings.inner_image_width }}%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Tipografía */
   {{ section.settings.font_family | font_face }}
   .font-custom-{{ section.id }} {
     font-family: {{ section.settings.font_family.family }}, {{ section.settings.font_family.fallback_families }};
   }
 
-  .brand-text-{{ section.id }} strong {
-    font-weight: 900; /* Fuerza la negrita extra */
-  }
-
   @media screen and (max-width: 768px) {
-    .brand-text-{{ section.id }} {
-      font-size: clamp(16px, 5vw, {{ section.settings.font_size }}px);
-      padding: 0 20px;
-    }
-    .brand-logo-{{ section.id }} {
-      width: {{ section.settings.logo_width | times: 0.8 }}px;
+    .brand-circle-{{ section.id }} {
+      width: {{ section.settings.circle_size | times: 0.7 }}px;
+      height: {{ section.settings.circle_size | times: 0.7 }}px;
     }
   }
 {%- endstyle -%}
 
 <div class="brand-statement-{{ section.id }} font-custom-{{ section.id }}">
   <div class="container mx-auto px-6">
+    {%- comment -%} Logo Superior {%- endcomment -%}
     {%- if section.settings.logo != blank -%}
       <div class="brand-logo-wrapper-{{ section.id }}">
         <img
@@ -66,9 +85,21 @@
       </div>
     {%- endif -%}
 
+    {%- comment -%} Texto Principal {%- endcomment -%}
     {%- if section.settings.content != blank -%}
       <div class="brand-text-{{ section.id }}">
         {{ section.settings.content }}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} Círculo con Imagen {%- endcomment -%}
+    {%- if section.settings.show_circle -%}
+      <div class="circle-container-{{ section.id }}">
+        <div class="brand-circle-{{ section.id }}">
+          {%- if section.settings.circle_image != blank -%}
+            <img src="{{ section.settings.circle_image | image_url: width: 400 }}" alt="Circle Image" loading="lazy">
+          {%- endif -%}
+        </div>
       </div>
     {%- endif -%}
   </div>
@@ -76,10 +107,10 @@
 
 {% schema %}
 {
-  "name": "Brand Statement & Logo",
+  "name": "Brand Statement & Circle",
   "settings": [
-    { "type": "header", "content": "Ajustes de Fondo" },
-    { "type": "color", "id": "bg_color", "label": "Color de Fondo", "default": "#ffffff" },
+    { "type": "header", "content": "Ajustes Generales" },
+    { "type": "color", "id": "bg_color", "label": "Color de Fondo Sección", "default": "#ffffff" },
     {
       "type": "range",
       "id": "padding_v",
@@ -90,9 +121,20 @@
       "label": "Espaciado Vertical",
       "default": 80
     },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "Alineación Global",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
 
-    { "type": "header", "content": "Logotipo" },
-    { "type": "image_picker", "id": "logo", "label": "Imagen del Logo" },
+    { "type": "header", "content": "Logotipo Superior" },
+    { "type": "image_picker", "id": "logo", "label": "Logo" },
     {
       "type": "range",
       "id": "logo_width",
@@ -100,7 +142,7 @@
       "max": 600,
       "step": 10,
       "unit": "px",
-      "label": "Ancho del Logo",
+      "label": "Ancho",
       "default": 150
     },
     {
@@ -110,19 +152,19 @@
       "max": 100,
       "step": 5,
       "unit": "px",
-      "label": "Margen inferior del Logo",
+      "label": "Margen Inferior",
       "default": 30
     },
 
-    { "type": "header", "content": "Texto y Tipografía" },
+    { "type": "header", "content": "Texto Principal" },
     {
       "type": "richtext",
       "id": "content",
-      "label": "Texto (Usa Negritas aquí)",
-      "default": "<p>Escribe aquí tu <strong>mensaje de marca</strong>.</p>"
+      "label": "Contenido",
+      "default": "<p>Escribe tu <strong>mensaje</strong> aquí.</p>"
     },
-    { "type": "color", "id": "text_color", "label": "Color de Texto", "default": "#000000" },
-    { "type": "font_picker", "id": "font_family", "label": "Tipografía", "default": "assistant_n4" },
+    { "type": "color", "id": "text_color", "label": "Color", "default": "#000000" },
+    { "type": "font_picker", "id": "font_family", "label": "Fuente", "default": "assistant_n4" },
     {
       "type": "range",
       "id": "font_size",
@@ -130,7 +172,7 @@
       "max": 100,
       "step": 1,
       "unit": "px",
-      "label": "Tamaño de Fuente",
+      "label": "Tamaño",
       "default": 24
     },
     {
@@ -140,13 +182,13 @@
       "max": 1400,
       "step": 50,
       "unit": "px",
-      "label": "Ancho máximo del texto",
+      "label": "Ancho Máximo del Texto",
       "default": 800
     },
     {
       "type": "select",
       "id": "font_weight",
-      "label": "Grosor (Normal)",
+      "label": "Grosor",
       "options": [
         { "value": "300", "label": "Light" },
         { "value": "400", "label": "Normal" },
@@ -157,10 +199,10 @@
     {
       "type": "select",
       "id": "text_transform",
-      "label": "Transformación",
+      "label": "Mayúsculas",
       "options": [
-        { "value": "none", "label": "Normal" },
-        { "value": "uppercase", "label": "MAYÚSCULAS" }
+        { "value": "none", "label": "No" },
+        { "value": "uppercase", "label": "Sí" }
       ],
       "default": "none"
     },
@@ -174,18 +216,53 @@
       ],
       "default": "normal"
     },
+
+    { "type": "header", "content": "Círculo Decorativo" },
+    { "type": "checkbox", "id": "show_circle", "label": "Mostrar Círculo", "default": true },
+    { "type": "color", "id": "circle_border_color", "label": "Color del Borde", "default": "#000000" },
     {
-      "type": "select",
-      "id": "horizontal_alignment",
-      "label": "Alineación Horizontal",
-      "options": [
-        { "value": "left", "label": "Izquierda" },
-        { "value": "center", "label": "Centro" },
-        { "value": "right", "label": "Derecha" }
-      ],
-      "default": "center"
+      "type": "range",
+      "id": "circle_border_width",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del Borde",
+      "default": 2
+    },
+    { "type": "color", "id": "circle_bg_color", "label": "Fondo del Círculo (Relleno)", "default": "transparent" },
+    {
+      "type": "range",
+      "id": "circle_size",
+      "min": 50,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Tamaño del Círculo",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "circle_margin_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Margen Superior",
+      "default": 40
+    },
+    { "type": "image_picker", "id": "circle_image", "label": "Imagen dentro del círculo" },
+    {
+      "type": "range",
+      "id": "inner_image_width",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Tamaño imagen interna",
+      "default": 60
     }
   ],
-  "presets": [{ "name": "Brand Statement & Logo" }]
+  "presets": [{ "name": "Brand Statement & Circle" }]
 }
 {% endschema %}
