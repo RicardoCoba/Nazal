@@ -31,9 +31,10 @@
     {% elsif section.settings.horizontal_alignment == 'right' %}
       margin-left: auto;
     {% endif %}
+    margin-bottom: 40px;
   }
 
-  /* --- SISTEMA AUTOMÁTICO DE RELOJ --- */
+  /* --- SISTEMA DE RELOJ ACTUALIZADO --- */
   .circle-container-{{ section.id }} {
     position: relative;
     display: inline-block;
@@ -62,7 +63,7 @@
     object-fit: contain;
   }
 
-  /* El punto pequeño automático */
+  /* Nodo posicionado en el borde */
   .clock-node-{{ section.id }} {
     position: absolute;
     z-index: 10;
@@ -72,28 +73,26 @@
     justify-content: center;
   }
 
+  /* El circulito decorativo sobre la línea */
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px;
     height: {{ section.settings.dot_size }}px;
     background-color: {{ section.settings.dot_color }};
-    border: 1px solid {{ section.settings.circle_border_color }};
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
     flex-shrink: 0;
+    z-index: 11;
   }
 
-  .node-dot-{{ section.id }} img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  /* Contenedor de contenido (Texto + Imagen debajo) */
+  .node-content-{{ section.id }} {
+    position: absolute;
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Espacio entre texto e imagen */
   }
 
   .node-text-{{ section.id }} {
-    position: absolute;
-    width: 200px;
     color: {{ section.settings.node_text_color }};
     font-size: {{ section.settings.node_font_size }}px;
     font-weight: {{ section.settings.node_font_weight }};
@@ -102,7 +101,13 @@
     line-height: 1.1;
   }
 
-  /* Posiciones Automáticas */
+  .node-image-wrap-{{ section.id }} img {
+    max-width: 100px; /* Tamaño ajustable de la imagen del bloque */
+    height: auto;
+    display: block;
+  }
+
+  /* Coordenadas Reloj */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -110,23 +115,24 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
-  /* Alineación del texto automática según posición */
-  .pos-12 .node-text-{{ section.id }} { bottom: 130%; text-align: center; }
-  .pos-2 .node-text-{{ section.id }}  { left: 130%; text-align: left; }
-  .pos-4 .node-text-{{ section.id }}  { left: 130%; text-align: left; }
-  .pos-6 .node-text-{{ section.id }}  { top: 130%; text-align: center; }
-  .pos-8 .node-text-{{ section.id }}  { right: 130%; text-align: right; }
-  .pos-10 .node-text-{{ section.id }} { right: 130%; text-align: right; }
+  /* Alineación de bloque de contenido según la hora */
+  .pos-12 .node-content-{{ section.id }} { bottom: 140%; align-items: center; text-align: center; }
+  .pos-2 .node-content-{{ section.id }}  { left: 140%; align-items: flex-start; text-align: left; }
+  .pos-4 .node-content-{{ section.id }}  { left: 140%; align-items: flex-start; text-align: left; }
+  .pos-6 .node-content-{{ section.id }}  { top: 140%; align-items: center; text-align: center; }
+  .pos-8 .node-content-{{ section.id }}  { right: 140%; align-items: flex-end; text-align: right; }
+  .pos-10 .node-content-{{ section.id }} { right: 140%; align-items: flex-end; text-align: right; }
 
   {{ section.settings.node_font_family | font_face }}
   .font-node-{{ section.id }} { font-family: {{ section.settings.node_font_family.family }}, sans-serif; }
 
   @media screen and (max-width: 768px) {
     .circle-container-{{ section.id }} {
-      width: min({{ section.settings.circle_size }}px, 60vw);
-      height: min({{ section.settings.circle_size }}px, 60vw);
+      width: min({{ section.settings.circle_size }}px, 55vw);
+      height: min({{ section.settings.circle_size }}px, 55vw);
     }
-    .node-text-{{ section.id }} { width: 90px; font-size: 11px; }
+    .node-content-{{ section.id }} { width: 100px; }
+    .node-text-{{ section.id }} { font-size: 11px; }
   }
 {%- endstyle -%}
 
@@ -157,17 +163,21 @@
             class="clock-node-{{ section.id }} pos-{{ block.settings.position }} font-node-{{ section.id }}"
             {{ block.shopify_attributes }}
           >
-            <div class="node-dot-{{ section.id }}">
+            <div class="node-dot-{{ section.id }}"></div>
+
+            <div class="node-content-{{ section.id }}">
+              {%- if block.settings.node_text != blank -%}
+                <div class="node-text-{{ section.id }}">
+                  {{ block.settings.node_text | newline_to_br }}
+                </div>
+              {%- endif -%}
+
               {%- if block.settings.node_image != blank -%}
-                <img src="{{ block.settings.node_image | image_url: width: 200 }}" alt="Icon">
+                <div class="node-image-wrap-{{ section.id }}">
+                  <img src="{{ block.settings.node_image | image_url: width: 300 }}" alt="Icon">
+                </div>
               {%- endif -%}
             </div>
-
-            {%- if block.settings.node_text != blank -%}
-              <div class="node-text-{{ section.id }}">
-                {{ block.settings.node_text | newline_to_br }}
-              </div>
-            {%- endif -%}
           </div>
         {%- endfor -%}
       </div>
@@ -330,16 +340,16 @@
     },
 
     { "type": "header", "content": "Estilo de los Puntos Horarios" },
-    { "type": "color", "id": "dot_color", "label": "Color del Punto", "default": "#000000" },
+    { "type": "color", "id": "dot_color", "label": "Color del Punto Decorativo", "default": "#000000" },
     {
       "type": "range",
       "id": "dot_size",
       "min": 5,
-      "max": 120,
+      "max": 80,
       "step": 5,
       "unit": "px",
       "label": "Tamaño del Punto",
-      "default": 20
+      "default": 15
     },
     { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
     { "type": "font_picker", "id": "node_font_family", "label": "Fuente Texto", "default": "assistant_n4" },
@@ -396,17 +406,17 @@
           "id": "position",
           "label": "Seleccionar Hora",
           "options": [
-            { "value": "12", "label": "12:00 (Arriba)" },
+            { "value": "12", "label": "12:00" },
             { "value": "2", "label": "02:00" },
             { "value": "4", "label": "04:00" },
-            { "value": "6", "label": "06:00 (Abajo)" },
+            { "value": "6", "label": "06:00" },
             { "value": "8", "label": "08:00" },
             { "value": "10", "label": "10:00" }
           ],
           "default": "12"
         },
-        { "type": "textarea", "id": "node_text", "label": "Texto del Punto" },
-        { "type": "image_picker", "id": "node_image", "label": "Imagen dentro del punto" }
+        { "type": "textarea", "id": "node_text", "label": "Texto" },
+        { "type": "image_picker", "id": "node_image", "label": "Imagen (Sale debajo del texto)" }
       ]
     }
   ],
