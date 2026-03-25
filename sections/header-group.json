@@ -83,7 +83,7 @@
         "logo": "shopify://shop_images/logo_blanco_1.png",
         "logo_width": 200,
         "menu_left": "main-menu",
-        "menu_right": "menu-derecho",
+        "menu_right": "",
         "bg_color": "#000000",
         "text_color": "#ffffff",
         "font_family": "assistant_n4",
