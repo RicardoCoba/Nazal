@@ -93,7 +93,7 @@
         "font_style": "normal",
         "cart_color": "#ffffff",
         "cart_size": 24,
-        "padding_vertical": 5
+        "padding_vertical": 50
       }
     }
   },
