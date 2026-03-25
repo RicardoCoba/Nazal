@@ -81,7 +81,7 @@
       "name": "Custom Split Header",
       "settings": {
         "logo": "shopify://shop_images/logo_blanco_1.png",
-        "logo_width": 100,
+        "logo_width": 200,
         "menu_left": "menu-izquierdo",
         "menu_right": "menu-derecho",
         "bg_color": "#000000",
