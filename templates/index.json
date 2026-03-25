@@ -132,6 +132,8 @@
         "circle_bg_color": "rgba(0,0,0,0)",
         "inner_image_width": 65,
         "circle_margin_top": 60,
+        "node_distance": 40,
+        "content_block_align": "center",
         "dot_color": "#000000",
         "dot_size": 14,
         "node_text_color": "#000000",
@@ -139,7 +141,6 @@
         "node_font_size": 24,
         "node_font_weight": "700",
         "node_text_transform": "uppercase",
-        "node_font_style": "normal",
         "node_content_width": 250,
         "node_icon_width": 50
       }
