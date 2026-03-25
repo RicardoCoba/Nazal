@@ -36,6 +36,19 @@
       "name": "Hero Video Slider",
       "settings": {}
     },
+    "separator_pKKz3L": {
+      "type": "separator",
+      "name": "Custom Image Separator",
+      "settings": {
+        "bg_color": "#000000",
+        "separator_height": 10,
+        "image": "shopify://shop_images/icon-nazal-blanco.png",
+        "image_width": 100,
+        "image_position": "center",
+        "show_placeholder": true,
+        "placeholder_color": "#000000"
+      }
+    },
     "rich_text": {
       "type": "rich-text",
       "blocks": {
@@ -203,6 +216,7 @@
   },
   "order": [
     "hero_banner_q9jUBG",
+    "separator_pKKz3L",
     "rich_text",
     "featured_collection",
     "collage",
