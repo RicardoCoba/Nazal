@@ -1,0 +1,194 @@
+{%- style -%}
+  .custom-header-{{ section.id }} {
+    background-color: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_vertical }}px 0;
+    border-bottom: 1px solid {{ section.settings.text_color | opacity: 0.1 }};
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-nav-link-{{ section.id }} {
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.font_size }}px;
+    font-weight: {{ section.settings.font_weight }};
+    text-transform: {{ section.settings.text_transform }};
+    font-style: {{ section.settings.font_style }};
+    transition: opacity 0.3s ease;
+  }
+
+  .header-nav-link-{{ section.id }}:hover {
+    opacity: 0.7;
+  }
+
+  .cart-icon-{{ section.id }} svg {
+    fill: {{ section.settings.cart_color }};
+    width: {{ section.settings.cart_size }}px;
+    height: auto;
+  }
+
+  {{ section.settings.font_family | font_face }}
+  .font-header-{{ section.id }} {
+    font-family: {{ section.settings.font_family.family }}, {{ section.settings.font_family.fallback_families }};
+  }
+{%- endstyle -%}
+
+<header class="custom-header-{{ section.id }} font-header-{{ section.id }}">
+  <div class="container mx-auto px-6">
+    <div class="grid grid-cols-3 items-center">
+      <nav class="hidden md:flex items-center gap-6">
+        {%- for link in section.settings.menu_left.links -%}
+          <a href="{{ link.url }}" class="header-nav-link-{{ section.id }}">
+            {{ link.title }}
+          </a>
+        {%- endfor -%}
+      </nav>
+
+      <div class="flex justify-center">
+        <a href="{{ routes.root_url }}" class="inline-block">
+          {%- if section.settings.logo != blank -%}
+            <img
+              src="{{ section.settings.logo | image_url: width: 400 }}"
+              alt="{{ shop.name }}"
+              style="width: {{ section.settings.logo_width }}px;"
+              class="h-auto"
+            >
+          {%- else -%}
+            <span class="text-2xl font-black uppercase italic text-[{{ section.settings.text_color }}]">
+              {{- shop.name -}}
+            </span>
+          {%- endif -%}
+        </a>
+      </div>
+
+      <div class="flex items-center justify-end gap-6">
+        <nav class="hidden md:flex items-center gap-6">
+          {%- for link in section.settings.menu_right.links -%}
+            <a href="{{ link.url }}" class="header-nav-link-{{ section.id }}">
+              {{ link.title }}
+            </a>
+          {%- endfor -%}
+        </nav>
+
+        <a href="{{ routes.cart_url }}" class="cart-icon-{{ section.id }} relative flex items-center">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+          </svg>
+          {%- if cart.item_count > 0 -%}
+            <span class="absolute -top-2 -right-2 bg-white text-black text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border border-black">
+              {{ cart.item_count }}
+            </span>
+          {%- endif -%}
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Custom Split Header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logotipo"
+    },
+    { "type": "image_picker", "id": "logo", "label": "Imagen del Logo" },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 50,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "Ancho del Logo",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Navegación (Menús)"
+    },
+    { "type": "link_list", "id": "menu_left", "label": "Menú Izquierdo" },
+    { "type": "link_list", "id": "menu_right", "label": "Menú Derecho" },
+    {
+      "type": "header",
+      "content": "Estilos de Texto"
+    },
+    { "type": "color", "id": "bg_color", "label": "Color de Fondo", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Color de Letras", "default": "#ffffff" },
+    { "type": "font_picker", "id": "font_family", "label": "Tipografía", "default": "assistant_n4" },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de Letra",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Grosor (Weight)",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "700", "label": "Bold" },
+        { "value": "900", "label": "Black" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Transformación",
+      "options": [
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "MAYÚSCULAS" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "select",
+      "id": "font_style",
+      "label": "Estilo",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "italic", "label": "Itálica" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "header",
+      "content": "Icono del Carrito"
+    },
+    { "type": "color", "id": "cart_color", "label": "Color de Icono", "default": "#ffffff" },
+    {
+      "type": "range",
+      "id": "cart_size",
+      "min": 15,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de Icono",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "min": 5,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding Vertical",
+      "default": 20
+    }
+  ],
+  "presets": [{ "name": "Custom Split Header" }]
+}
+{% endschema %}
