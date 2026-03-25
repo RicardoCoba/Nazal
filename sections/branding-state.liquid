@@ -4,38 +4,34 @@
     padding: {{ section.settings.padding_v }}px 0;
     text-align: center;
     overflow: visible;
-    /* Perspectiva agresiva para el efecto 3D */
-    perspective: 500px;
+    perspective: 1000px;
   }
 
-  .brand-header-{{ section.id }} {
-    max-width: {{ section.settings.content_max_width }}px;
-    margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
+  /* --- ANIMACIÓN 3D INFINITA --- */
+  @keyframes floating3D-{{ section.id }} {
+    0% {
+      transform: translate(-50%, -50%) translateZ(50px) rotateX(0deg) rotateY(0deg);
+    }
+    25% {
+      transform: translate(-50%, -55%) translateZ(70px) rotateX(15deg) rotateY(10deg);
+    }
+    50% {
+      transform: translate(-50%, -50%) translateZ(50px) rotateX(0deg) rotateY(20deg);
+    }
+    75% {
+      transform: translate(-50%, -45%) translateZ(70px) rotateX(-15deg) rotateY(10deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) translateZ(50px) rotateX(0deg) rotateY(0deg);
+    }
   }
 
-  .brand-logo-{{ section.id }} {
-    width: {{ section.settings.logo_width }}px;
-    height: auto;
-    margin-bottom: 20px;
-    display: inline-block;
-  }
-
-  .brand-text-{{ section.id }} {
-    color: {{ section.settings.text_color }};
-    font-size: {{ section.settings.font_size }}px;
-    font-weight: {{ section.settings.font_weight }};
-    text-transform: {{ section.settings.text_transform }};
-    line-height: 1.2;
-  }
-
-  /* --- SISTEMA RELOJ --- */
   .circle-wrapper-{{ section.id }} {
     display: flex;
     justify-content: center;
     margin-top: {{ section.settings.circle_margin_top }}px;
     padding: 150px 0;
     position: relative;
-    /* Necesario para movimiento en eje Z */
     transform-style: preserve-3d;
   }
 
@@ -46,20 +42,20 @@
     border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
     border-radius: 50%;
     background-color: {{ section.settings.circle_bg_color }};
+    transform-style: preserve-3d;
   }
 
-  /* IMAGEN CENTRAL 3D - SIN SOMBRAS */
+  /* IMAGEN CENTRAL CON ANIMACIÓN AUTOMÁTICA */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
     left: 50%;
-    /* translateZ la saca del plano del círculo */
-    transform: translate(-50%, -50%) translateZ(80px);
     width: {{ section.settings.inner_image_width }}%;
     z-index: 5;
     pointer-events: none;
-    transition: transform 0.1s ease-out;
     transform-style: preserve-3d;
+    /* 6 segundos de duración, suave, infinito */
+    animation: floating3D-{{ section.id }} 6s ease-in-out infinite;
     will-change: transform;
   }
 
@@ -67,11 +63,10 @@
     width: 100%;
     height: auto;
     display: block;
-    /* ELIMINADA LA SOMBRA PROYECTADA */
     filter: none !important;
   }
 
-  /* NODOS ESTÁTICOS */
+  /* NODOS (ESTÁTICOS) */
   .clock-node-{{ section.id }} {
     position: absolute;
     width: 0;
@@ -105,13 +100,7 @@
     line-height: 1.1;
   }
 
-  .node-icon-{{ section.id }} img {
-    width: {{ section.settings.node_icon_width }}px;
-    height: auto;
-    display: block;
-  }
-
-  /* Coordenadas */
+  /* Posiciones Horarias */
   .pos-12 { top: 0%; left: 50%; }
   .pos-2  { top: 25%; left: 93.3%; }
   .pos-4  { top: 75%; left: 93.3%; }
@@ -132,30 +121,18 @@
   }
 {%- endstyle -%}
 
-<div class="brand-statement-{{ section.id }}" id="Section-{{ section.id }}">
+<div class="brand-statement-{{ section.id }}">
   <div class="container mx-auto px-6">
-    <div
-      class="brand-header-{{ section.id }}"
-      style="font-family: {{ section.settings.font_family.family }}, sans-serif;"
-    >
-      {%- if section.settings.logo != blank -%}
-        <img src="{{ section.settings.logo | image_url: width: 600 }}" class="brand-logo-{{ section.id }}" alt="Logo">
-      {%- endif -%}
-      {%- if section.settings.content != blank -%}
-        <div class="brand-text-{{ section.id }}">{{ section.settings.content }}</div>
-      {%- endif -%}
-    </div>
-
     <div class="circle-wrapper-{{ section.id }}">
       <div class="circle-container-{{ section.id }}">
-        <div class="center-image-{{ section.id }}" id="Tilt-Image-{{ section.id }}">
+        <div class="center-image-{{ section.id }}">
           {%- if section.settings.circle_image != blank -%}
             <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Product">
           {%- endif -%}
         </div>
 
         {%- for block in section.blocks -%}
-          <div class="clock-node-{{ section.id }} pos-{{ block.settings.position }}" {{ block.shopify_attributes }}>
+          <div class="clock-node-{{ section.id }} pos-{{ block.settings.position }}">
             <div class="node-dot-{{ section.id }}">&nbsp;</div>
             <div
               class="node-content-{{ section.id }}"
@@ -164,11 +141,6 @@
               {%- if block.settings.node_text != blank -%}
                 <div class="node-text-{{ section.id }}">{{ block.settings.node_text | escape }}</div>
               {%- endif -%}
-              {%- if block.settings.node_image != blank -%}
-                <div class="node-icon-{{ section.id }}">
-                  <img src="{{ block.settings.node_image | image_url: width: 300 }}" alt="Icon">
-                </div>
-              {%- endif -%}
             </div>
           </div>
         {%- endfor -%}
@@ -176,40 +148,6 @@
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const container = document.getElementById('Section-{{ section.id }}');
-    const image = document.getElementById('Tilt-Image-{{ section.id }}');
-    if (!container || !image) return;
-
-    container.addEventListener('mousemove', (e) => {
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-
-      // Aumentamos la potencia a 45 para que se incline MUCHO más
-      const rotateX = ((y - centerY) / centerY) * -45;
-      const rotateY = ((x - centerX) / centerX) * 45;
-
-      // Mantenemos los otros elementos quietos, solo transformamos "image"
-      // ELIMINADO EL FILTRO DE SOMBRA DINÁMICA
-      image.style.transform = `translate(-50%, -50%) translateZ(100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.1)`;
-    });
-
-    container.addEventListener('mouseleave', () => {
-      image.style.transition = 'transform 0.5s ease-out';
-      // Volver a la posición central original
-      image.style.transform = `translate(-50%, -50%) translateZ(80px) rotateX(0deg) rotateY(0deg) scale(1)`;
-      setTimeout(() => {
-        image.style.transition = 'transform 0.1s ease-out';
-      }, 500);
-    });
-  });
-</script>
 
 {% schema %}
 {
@@ -226,51 +164,6 @@
       "unit": "px",
       "label": "Padding Vertical",
       "default": 100
-    },
-    { "type": "header", "content": "Logo y Texto Superior" },
-    { "type": "image_picker", "id": "logo", "label": "Logo" },
-    {
-      "type": "range",
-      "id": "logo_width",
-      "min": 50,
-      "max": 400,
-      "step": 10,
-      "unit": "px",
-      "label": "Ancho Logo",
-      "default": 150
-    },
-    { "type": "richtext", "id": "content", "label": "Texto Principal" },
-    { "type": "color", "id": "text_color", "label": "Color Texto", "default": "#000000" },
-    { "type": "font_picker", "id": "font_family", "label": "Fuente Principal", "default": "assistant_n4" },
-    {
-      "type": "range",
-      "id": "font_size",
-      "min": 10,
-      "max": 100,
-      "step": 2,
-      "unit": "px",
-      "label": "Tamaño Fuente",
-      "default": 24
-    },
-    {
-      "type": "range",
-      "id": "content_max_width",
-      "min": 300,
-      "max": 1200,
-      "step": 50,
-      "unit": "px",
-      "label": "Ancho Máximo",
-      "default": 600
-    },
-    {
-      "type": "range",
-      "id": "logo_margin_bottom",
-      "min": 0,
-      "max": 200,
-      "step": 10,
-      "unit": "px",
-      "label": "Margen abajo cabecera",
-      "default": 60
     },
     { "type": "header", "content": "Círculo de Producto" },
     { "type": "image_picker", "id": "circle_image", "label": "Imagen del Producto (Centro)" },
@@ -380,16 +273,6 @@
       "unit": "px",
       "label": "Ancho Bloque",
       "default": 160
-    },
-    {
-      "type": "range",
-      "id": "node_icon_width",
-      "min": 10,
-      "max": 200,
-      "step": 5,
-      "unit": "px",
-      "label": "Tamaño Icono",
-      "default": 40
     }
   ],
   "blocks": [
@@ -411,8 +294,7 @@
           ],
           "default": "12"
         },
-        { "type": "text", "id": "node_text", "label": "Texto" },
-        { "type": "image_picker", "id": "node_image", "label": "Icono" }
+        { "type": "text", "id": "node_text", "label": "Texto" }
       ]
     }
   ],
