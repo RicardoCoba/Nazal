@@ -3,15 +3,19 @@
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_v }}px 0;
     text-align: center;
-    overflow: visible;
+    position: relative;
+    overflow: visible !important; /* Vital para que no se corte nada */
   }
 
   /* --- CONTENEDOR CIRCULAR --- */
   .circle-wrapper-{{ section.id }} {
     display: flex;
     justify-content: center;
-    margin-top: {{ section.settings.circle_margin_top }}px;
-    padding: 180px 0; /* Espacio extra para que no se corten los textos alejados */
+    align-items: center;
+    margin: {{ section.settings.circle_margin_top }}px auto;
+    padding: 120px 0;
+    width: 100%;
+    position: relative;
   }
 
   .circle-container-{{ section.id }} {
@@ -20,30 +24,23 @@
     height: {{ section.settings.circle_size }}px;
     border: {{ section.settings.circle_border_width }}px solid {{ section.settings.circle_border_color }};
     border-radius: 50%;
+    display: block;
+    margin: 0 auto;
   }
 
-  /* Imagen Central */
-  .center-image-{{ section.id }} {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: {{ section.settings.inner_image_width }}%;
-    z-index: 1;
-  }
-  .center-image-{{ section.id }} img { width: 100%; height: auto; display: block; }
-
-  /* --- PUNTOS NEGROS ESTÁTICOS --- */
+  /* PUNTOS NEGROS ESTÁTICOS (Forzados) */
   .static-dot-{{ section.id }} {
     position: absolute;
     width: {{ section.settings.dot_size }}px;
     height: {{ section.settings.dot_size }}px;
-    background-color: {{ section.settings.dot_color }};
+    background-color: {{ section.settings.dot_color }} !important;
     border-radius: 50%;
-    z-index: 5;
-    transform: translate(-50%, -50%); /* Centra el punto exacto sobre la línea */
+    z-index: 50; /* Muy alto para que esté por encima de todo */
+    transform: translate(-50%, -50%);
+    display: block !important;
   }
 
-  /* Posiciones exactas (Reloj) */
+  /* Posiciones de los puntos */
   .dot-12 { top: 0%; left: 50%; }
   .dot-2  { top: 25%; left: 93.3%; }
   .dot-4  { top: 75%; left: 93.3%; }
@@ -51,16 +48,15 @@
   .dot-8  { top: 75%; left: 6.7%; }
   .dot-10 { top: 25%; left: 6.7%; }
 
-  /* --- BLOQUES DE CONTENIDO --- */
+  /* Contenido (Texto e Icono) */
   .node-content-{{ section.id }} {
     position: absolute;
     display: flex;
     flex-direction: column;
-    gap: 12px;
     width: {{ section.settings.node_content_width }}px;
     align-items: {{ section.settings.content_block_align }};
     text-align: {{ section.settings.content_block_align | replace: 'flex-start', 'left' | replace: 'flex-end', 'right' }};
-    z-index: 10;
+    z-index: 60;
   }
 
   .node-text-{{ section.id }} {
@@ -69,17 +65,16 @@
     font-weight: {{ section.settings.node_font_weight }};
     text-transform: {{ section.settings.node_text_transform }};
     line-height: 1.1;
+    margin-bottom: 8px;
   }
 
   .node-icon-{{ section.id }} img {
     width: {{ section.settings.node_icon_width }}px;
     height: auto;
-    display: block;
   }
 
-  /* Separación dinámica desde el punto negro hacia afuera */
+  /* Separación */
   {%- assign gap = section.settings.node_distance -%}
-
   .pos-12 { bottom: {{ gap }}px; left: 50%; transform: translateX(-50%); }
   .pos-2  { left: {{ gap }}px; top: 0; transform: translateY(-50%); }
   .pos-4  { left: {{ gap }}px; bottom: 0; transform: translateY(50%); }
@@ -88,49 +83,43 @@
   .pos-10 { right: {{ gap }}px; top: 0; transform: translateY(-50%); }
 
   @media screen and (max-width: 768px) {
-    .circle-wrapper-{{ section.id }} { transform: scale(0.6); padding: 60px 0; }
-    .node-content-{{ section.id }} { width: 110px !important; }
+    .circle-wrapper-{{ section.id }} { transform: scale(0.55); }
   }
 {%- endstyle -%}
 
 <div class="brand-statement-{{ section.id }}">
-  <div class="container mx-auto px-6">
-    <div class="circle-wrapper-{{ section.id }}">
-      <div class="circle-container-{{ section.id }}">
-        <div class="static-dot-{{ section.id }} dot-12"></div>
-        <div class="static-dot-{{ section.id }} dot-2"></div>
-        <div class="static-dot-{{ section.id }} dot-4"></div>
-        <div class="static-dot-{{ section.id }} dot-6"></div>
-        <div class="static-dot-{{ section.id }} dot-8"></div>
-        <div class="static-dot-{{ section.id }} dot-10"></div>
+  <div class="circle-wrapper-{{ section.id }}">
+    <div class="circle-container-{{ section.id }}">
+      <div class="static-dot-{{ section.id }} dot-12"></div>
+      <div class="static-dot-{{ section.id }} dot-2"></div>
+      <div class="static-dot-{{ section.id }} dot-4"></div>
+      <div class="static-dot-{{ section.id }} dot-6"></div>
+      <div class="static-dot-{{ section.id }} dot-8"></div>
+      <div class="static-dot-{{ section.id }} dot-10"></div>
 
-        <div class="center-image-{{ section.id }}">
-          {%- if section.settings.circle_image != blank -%}
-            <img src="{{ section.settings.circle_image | image_url: width: 1000 }}" alt="Product">
+      {%- if section.settings.circle_image != blank -%}
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: {{ section.settings.inner_image_width }}%; z-index: 10;">
+          <img src="{{ section.settings.circle_image | image_url: width: 800 }}" style="width: 100%; height: auto;">
+        </div>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        <div class="node-content-{{ section.id }} pos-{{ block.settings.position }}" {{ block.shopify_attributes }}>
+          {%- if block.settings.node_text != blank -%}
+            <div
+              class="node-text-{{ section.id }}"
+              style="font-family: {{ section.settings.node_font_family.family }}, sans-serif;"
+            >
+              {{ block.settings.node_text | escape }}
+            </div>
+          {%- endif -%}
+          {%- if block.settings.node_image != blank -%}
+            <div class="node-icon-{{ section.id }}">
+              <img src="{{ block.settings.node_image | image_url: width: 200 }}" alt="Icon">
+            </div>
           {%- endif -%}
         </div>
-
-        {%- for block in section.blocks -%}
-          <div
-            class="node-content-{{ section.id }} pos-{{ block.settings.position }} dot-{{ block.settings.position }}"
-            {{ block.shopify_attributes }}
-          >
-            {%- if block.settings.node_text != blank -%}
-              <div
-                class="node-text-{{ section.id }}"
-                style="font-family: {{ section.settings.node_font_family.family }}, sans-serif;"
-              >
-                {{ block.settings.node_text | escape }}
-              </div>
-            {%- endif -%}
-            {%- if block.settings.node_image != blank -%}
-              <div class="node-icon-{{ section.id }}">
-                <img src="{{ block.settings.node_image | image_url: width: 300 }}" alt="Icon">
-              </div>
-            {%- endif -%}
-          </div>
-        {%- endfor -%}
-      </div>
+      {%- endfor -%}
     </div>
   </div>
 </div>
@@ -139,114 +128,64 @@
 {
   "name": "Brand Circular Feature",
   "settings": [
-    { "type": "header", "content": "Ajustes Generales" },
-    { "type": "color", "id": "bg_color", "label": "Fondo Sección", "default": "#ffffff" },
+    { "type": "color", "id": "bg_color", "label": "Fondo", "default": "#ffffff" },
     {
       "type": "range",
       "id": "padding_v",
       "min": 0,
-      "max": 400,
+      "max": 300,
       "step": 10,
       "unit": "px",
-      "label": "Padding Vertical",
+      "label": "Padding",
       "default": 100
     },
-    { "type": "header", "content": "Círculo Principal y Puntos" },
-    { "type": "image_picker", "id": "circle_image", "label": "Imagen Producto Centro" },
+    { "type": "image_picker", "id": "circle_image", "label": "Imagen Centro" },
     {
       "type": "range",
       "id": "circle_size",
       "min": 200,
-      "max": 800,
-      "step": 20,
+      "max": 700,
+      "step": 10,
       "unit": "px",
-      "label": "Diámetro Círculo Línea",
-      "default": 450
+      "label": "Tamaño Círculo",
+      "default": 400
     },
     { "type": "color", "id": "circle_border_color", "label": "Color Línea", "default": "#000000" },
-    {
-      "type": "range",
-      "id": "circle_border_width",
-      "min": 1,
-      "max": 5,
-      "step": 1,
-      "unit": "px",
-      "label": "Grosor Línea",
-      "default": 1
-    },
-    { "type": "color", "id": "dot_color", "label": "Color de los 6 Puntos", "default": "#000000" },
-    {
-      "type": "range",
-      "id": "dot_size",
-      "min": 6,
-      "max": 30,
-      "step": 2,
-      "unit": "px",
-      "label": "Tamaño de Puntos",
-      "default": 14
-    },
+    { "type": "range", "id": "circle_border_width", "min": 1, "max": 5, "label": "Grosor Línea", "default": 1 },
+    { "type": "color", "id": "dot_color", "label": "Color Puntos", "default": "#000000" },
+    { "type": "range", "id": "dot_size", "min": 5, "max": 30, "label": "Tamaño Puntos", "default": 12 },
     {
       "type": "range",
       "id": "inner_image_width",
       "min": 10,
-      "max": 150,
-      "step": 5,
+      "max": 130,
       "unit": "%",
-      "label": "Escala Imagen Producto",
+      "label": "Escala Imagen",
       "default": 80
     },
-    {
-      "type": "range",
-      "id": "circle_margin_top",
-      "min": 0,
-      "max": 200,
-      "step": 10,
-      "unit": "px",
-      "label": "Margen Superior",
-      "default": 40
-    },
-    { "type": "header", "content": "Contenido de Beneficios" },
-    {
-      "type": "range",
-      "id": "node_distance",
-      "min": 10,
-      "max": 250,
-      "step": 5,
-      "unit": "px",
-      "label": "Distancia (Texto al Punto)",
-      "default": 60
-    },
+    { "type": "range", "id": "circle_margin_top", "min": 0, "max": 150, "label": "Margen Superior", "default": 40 },
+    { "type": "range", "id": "node_distance", "min": 10, "max": 200, "label": "Distancia Texto", "default": 50 },
     {
       "type": "select",
       "id": "content_block_align",
-      "label": "Alineación Texto/Imagen",
+      "label": "Alineación",
       "options": [
-        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "flex-start", "label": "Izq" },
         { "value": "center", "label": "Centro" },
-        { "value": "flex-end", "label": "Derecha" }
+        { "value": "flex-end", "label": "Der" }
       ],
       "default": "center"
     },
     { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
-    { "type": "font_picker", "id": "node_font_family", "label": "Fuente Beneficios", "default": "assistant_n4" },
-    {
-      "type": "range",
-      "id": "node_font_size",
-      "min": 8,
-      "max": 40,
-      "step": 1,
-      "unit": "px",
-      "label": "Tamaño Fuente",
-      "default": 14
-    },
+    { "type": "font_picker", "id": "node_font_family", "label": "Fuente", "default": "assistant_n4" },
+    { "type": "range", "id": "node_font_size", "min": 10, "max": 30, "label": "Tamaño Letra", "default": 14 },
     {
       "type": "select",
       "id": "node_font_weight",
-      "label": "Peso Fuente",
+      "label": "Peso",
       "options": [
         { "value": "400", "label": "Normal" },
-        { "value": "700", "label": "Bold" },
-        { "value": "900", "label": "Black" }
+        { "value": "700", "label": "Bold" }
       ],
       "default": "700"
     },
@@ -260,26 +199,8 @@
       ],
       "default": "uppercase"
     },
-    {
-      "type": "range",
-      "id": "node_content_width",
-      "min": 50,
-      "max": 500,
-      "step": 10,
-      "unit": "px",
-      "label": "Ancho del Bloque",
-      "default": 180
-    },
-    {
-      "type": "range",
-      "id": "node_icon_width",
-      "min": 10,
-      "max": 200,
-      "step": 5,
-      "unit": "px",
-      "label": "Tamaño Imagen Beneficio",
-      "default": 40
-    }
+    { "type": "range", "id": "node_content_width", "min": 50, "max": 400, "label": "Ancho Bloque", "default": 150 },
+    { "type": "range", "id": "node_icon_width", "min": 10, "max": 150, "label": "Tamaño Icono", "default": 40 }
   ],
   "blocks": [
     {
@@ -289,19 +210,19 @@
         {
           "type": "select",
           "id": "position",
-          "label": "Asignar a Punto (Hora)",
+          "label": "Hora",
           "options": [
-            { "value": "12", "label": "12:00 (Arriba)" },
-            { "value": "2", "label": "02:00" },
-            { "value": "4", "label": "04:00" },
-            { "value": "6", "label": "06:00 (Abajo)" },
-            { "value": "8", "label": "08:00" },
-            { "value": "10", "label": "10:00" }
+            { "value": "12", "label": "12" },
+            { "value": "2", "label": "2" },
+            { "value": "4", "label": "4" },
+            { "value": "6", "label": "6" },
+            { "value": "8", "label": "8" },
+            { "value": "10", "label": "10" }
           ],
           "default": "12"
         },
-        { "type": "text", "id": "node_text", "label": "Texto del Beneficio" },
-        { "type": "image_picker", "id": "node_image", "label": "Imagen del Beneficio" }
+        { "type": "text", "id": "node_text", "label": "Texto" },
+        { "type": "image_picker", "id": "node_image", "label": "Icono" }
       ]
     }
   ],
