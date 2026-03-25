@@ -6,6 +6,7 @@
     overflow: visible;
   }
 
+  /* Cabecera: Logo y Texto superior */
   .brand-header-{{ section.id }} {
     max-width: {{ section.settings.content_max_width }}px;
     margin: 0 auto {{ section.settings.logo_margin_bottom }}px auto;
@@ -27,14 +28,15 @@
     line-height: 1.2;
   }
 
-  /* --- SISTEMA RELOJ --- */
+  /* --- SISTEMA RELOJ CORREGIDO --- */
   .circle-wrapper-{{ section.id }} {
     display: flex;
     justify-content: center;
     margin-top: {{ section.settings.circle_margin_top }}px;
-    padding: 150px 0; /* Aumentado para dar aire al alejamiento */
+    padding: 150px 0; /* Espacio para el contenido exterior */
   }
 
+  /* Círculo de Producto (Gris/Línea) */
   .circle-container-{{ section.id }} {
     position: relative;
     width: {{ section.settings.circle_size }}px;
@@ -44,6 +46,7 @@
     background-color: {{ section.settings.circle_bg_color }};
   }
 
+  /* Imagen de Producto Centro */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
@@ -60,7 +63,7 @@
     display: block;
   }
 
-  /* Nodos */
+  /* Nodos Horarios */
   .clock-node-{{ section.id }} {
     position: absolute;
     width: 0;
@@ -68,18 +71,19 @@
     z-index: 10;
   }
 
-  /* El Punto Negro */
+  /* --- EL CÍRCULO DECORATIVO QUE NO SALÍA --- */
   .node-dot-{{ section.id }} {
     width: {{ section.settings.dot_size }}px;
     height: {{ section.settings.dot_size }}px;
     background-color: {{ section.settings.dot_color }};
+    border: 1px solid {{ section.settings.circle_border_color }}; /* Un pequeño borde para definirlo */
     border-radius: 50%;
     position: absolute;
     transform: translate(-50%, -50%);
     z-index: 20;
   }
 
-  /* Contenedor de Contenido */
+  /* Contenedor de Contenido (Texto e Icono) */
   .node-content-{{ section.id }} {
     position: absolute;
     display: flex;
@@ -114,7 +118,7 @@
   .pos-8  { top: 75%; left: 6.7%; }
   .pos-10 { top: 25%; left: 6.7%; }
 
-  /* --- SEPARACIÓN DINÁMICA --- */
+  /* Separación radial externa */
   {%- assign dist = section.settings.node_distance -%}
 
   .pos-12 .node-content-{{ section.id }} { bottom: {{ dist }}px; left: 50%; transform: translateX(-50%); }
@@ -128,7 +132,7 @@
   {{ section.settings.node_font_family | font_face }}
 
   @media screen and (max-width: 768px) {
-    .circle-wrapper-{{ section.id }} { transform: scale(0.65); padding: 40px 0; }
+    .circle-wrapper-{{ section.id }} { transform: scale(0.6); padding: 40px 0; }
     .node-content-{{ section.id }} { width: 100px !important; }
   }
 {%- endstyle -%}
@@ -270,6 +274,7 @@
       "label": "Grosor Línea",
       "default": 1
     },
+    { "type": "color", "id": "circle_bg_color", "label": "Fondo Círculo", "default": "transparent" },
     {
       "type": "range",
       "id": "inner_image_width",
@@ -313,7 +318,7 @@
       ],
       "default": "center"
     },
-    { "type": "color", "id": "dot_color", "label": "Color del Punto", "default": "#000000" },
+    { "type": "color", "id": "dot_color", "label": "Color del Punto Decorativo", "default": "#000000" },
     {
       "type": "range",
       "id": "dot_size",
@@ -324,7 +329,7 @@
       "label": "Tamaño Punto",
       "default": 12
     },
-    { "type": "color", "id": "node_text_color", "label": "Color Texto", "default": "#000000" },
+    { "type": "color", "id": "node_text_color", "label": "Color Texto Beneficio", "default": "#000000" },
     { "type": "font_picker", "id": "node_font_family", "label": "Fuente Beneficios", "default": "assistant_n4" },
     {
       "type": "range",
@@ -333,7 +338,7 @@
       "max": 50,
       "step": 1,
       "unit": "px",
-      "label": "Tamaño Fuente",
+      "label": "Tamaño Letra",
       "default": 14
     },
     {
@@ -348,10 +353,20 @@
       "default": "700"
     },
     {
+      "type": "select",
+      "id": "node_text_transform",
+      "label": "Transformación",
+      "options": [
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "MAYÚSCULAS" }
+      ],
+      "default": "uppercase"
+    },
+    {
       "type": "range",
       "id": "node_content_width",
       "min": 50,
-      "max": 500,
+      "max": 400,
       "step": 10,
       "unit": "px",
       "label": "Ancho del Bloque",
