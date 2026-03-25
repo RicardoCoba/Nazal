@@ -89,7 +89,7 @@
         "font_family": "assistant_n4",
         "font_size": 26,
         "font_weight": "700",
-        "text_transform": "uppercase",
+        "text_transform": "none",
         "font_style": "normal",
         "cart_color": "#ffffff",
         "cart_size": 24,
