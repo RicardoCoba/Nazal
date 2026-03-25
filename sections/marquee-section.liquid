@@ -4,43 +4,61 @@
     100% { transform: translateX(-50%); }
   }
 
-  .animate-marquee {
+  .animate-marquee-{{ section.id }} {
     display: flex;
     width: max-content;
     animation: marquee {{ section.settings.speed }}s linear infinite;
   }
 
-  .marquee-container:hover .animate-marquee {
-    animation-play-state: {% if section.settings.pause_on_hover %}paused{% else %}running{% endif %};
+  /* Aplicamos los estilos globales de la sección */
+  .marquee-text-{{ section.id }} {
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.font_size_mobile }}px;
+    font-weight: {{ section.settings.font_weight }};
+    text-transform: {{ section.settings.text_transform }};
+    font-style: {{ section.settings.font_style }};
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: {{ section.settings.gap }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .marquee-text-{{ section.id }} {
+      font-size: {{ section.settings.font_size_desktop }}px;
+    }
+  }
+
+  /* Inyectar la fuente personalizada si se selecciona */
+  {{ section.settings.font_family | font_face }}
+  .font-custom-{{ section.id }} {
+    font-family: {{ section.settings.font_family.family }}, {{ section.settings.font_family.fallback_families }};
   }
 {%- endstyle -%}
 
 <div
-  class="marquee-container overflow-hidden border-y border-white/10 py-4"
+  class="marquee-container overflow-hidden py-4 border-y border-white/10"
   style="background-color: {{ section.settings.bg_color }};"
 >
-  <div class="animate-marquee">
-    {%- comment -%} Repetimos el bucle dos veces para el efecto infinito {%- endcomment -%}
+  <div class="animate-marquee-{{ section.id }}">
     {%- for i in (1..2) -%}
-      <div class="flex items-center gap-12 px-6">
+      <div class="flex items-center px-4" style="gap: {{ section.settings.gap }}px;">
         {%- for block in section.blocks -%}
-          <div class="flex items-center gap-4 flex-shrink-0" {{ block.shopify_attributes }}>
+          <div
+            class="marquee-text-{{ section.id }} font-custom-{{ section.id }} flex-shrink-0"
+            {{ block.shopify_attributes }}
+          >
             {%- if block.settings.image != blank -%}
               <img
-                src="{{ block.settings.image | image_url: width: 100 }}"
+                src="{{ block.settings.image | image_url: width: 200 }}"
                 alt="{{ block.settings.text }}"
-                class="h-8 md:h-12 w-auto object-contain"
+                style="height: {{ section.settings.img_height }}px; w-auto object-contain;"
                 loading="lazy"
               >
             {%- endif -%}
 
             {%- if block.settings.text != blank -%}
-              <span
-                class="text-white text-xl md:text-3xl font-black uppercase italic tracking-tighter"
-                style="color: {{ section.settings.text_color }};"
-              >
-                {{ block.settings.text }}
-              </span>
+              <span>{{ block.settings.text }}</span>
             {%- endif -%}
           </div>
         {%- endfor -%}
@@ -51,61 +69,123 @@
 
 {% schema %}
 {
-  "name": "Marquee Infinito",
+  "name": "Marquee Pro Custom",
   "settings": [
     {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Color de Fondo",
-      "default": "#000000"
+      "type": "header",
+      "content": "Colores y Fondo"
+    },
+    { "type": "color", "id": "bg_color", "label": "Color de Fondo", "default": "#000000" },
+    { "type": "color", "id": "text_color", "label": "Color de Texto", "default": "#ffffff" },
+    {
+      "type": "header",
+      "content": "Tipografía y Estilo"
     },
     {
-      "type": "color",
-      "id": "text_color",
-      "label": "Color de Texto",
-      "default": "#ffffff"
+      "type": "font_picker",
+      "id": "font_family",
+      "label": "Fuente Personalizada",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "font_size_desktop",
+      "min": 10,
+      "max": 150,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño Desktop",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "min": 10,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño Mobile",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Grosor (Weight)",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "700", "label": "Bold" },
+        { "value": "900", "label": "Black" }
+      ],
+      "default": "900"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Transformación",
+      "options": [
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "MAYÚSCULAS" },
+        { "value": "lowercase", "label": "minúsculas" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "select",
+      "id": "font_style",
+      "label": "Estilo",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "italic", "label": "Itálica" }
+      ],
+      "default": "italic"
+    },
+    {
+      "type": "header",
+      "content": "Ajustes de Animación e Imágenes"
     },
     {
       "type": "range",
       "id": "speed",
-      "min": 5,
-      "max": 50,
-      "step": 5,
+      "min": 2,
+      "max": 60,
+      "step": 1,
       "unit": "s",
-      "label": "Velocidad (Segundos)",
-      "default": 20
+      "label": "Velocidad",
+      "default": 15
     },
     {
-      "type": "checkbox",
-      "id": "pause_on_hover",
-      "label": "Pausar al pasar el mouse",
-      "default": true
+      "type": "range",
+      "id": "gap",
+      "min": 10,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Espacio entre elementos",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "img_height",
+      "min": 10,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Altura de Imágenes",
+      "default": 40
     }
   ],
   "blocks": [
     {
       "type": "item",
-      "name": "Elemento de cintilla",
+      "name": "Elemento",
       "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Imagen / Icono"
-        },
-        {
-          "type": "text",
-          "id": "text",
-          "label": "Texto",
-          "default": "NUEVO LANZAMIENTO"
-        }
+        { "type": "image_picker", "id": "image", "label": "Icono/Imagen" },
+        { "type": "text", "id": "text", "label": "Texto", "default": "NUEVO DROP" }
       ]
     }
   ],
-  "presets": [
-    {
-      "name": "Marquee Infinito",
-      "blocks": [{ "type": "item" }, { "type": "item" }, { "type": "item" }]
-    }
-  ]
+  "presets": [{ "name": "Marquee Pro Custom" }]
 }
 {% endschema %}
