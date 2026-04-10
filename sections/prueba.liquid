@@ -4,7 +4,6 @@
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_v }}px 0;
     overflow: hidden;
-    cursor: none;
   }
 
   .cursor-blob-{{ section.id }} {
@@ -12,8 +11,8 @@
     width: 500px;
     height: 500px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.1) 40%, transparent 70%);
-    filter: blur(50px);
+    background: radial-gradient(circle, #000000 0%, rgba(0,0,0,0.6) 30%, transparent 70%);
+    filter: blur(25px);
     pointer-events: none;
     transform: translate(-50%, -50%);
     left: 50%;
@@ -35,9 +34,7 @@
 
 <div class="cursor-section-{{ section.id }}" id="CursorSection-{{ section.id }}">
   <div class="cursor-blob-{{ section.id }}" id="CursorBlob-{{ section.id }}"></div>
-  <div class="cursor-section-content-{{ section.id }}">
-    {{ section.blocks }}
-  </div>
+  <div class="cursor-section-content-{{ section.id }}"></div>
 </div>
 
 <script>
