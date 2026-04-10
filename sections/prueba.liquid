@@ -1,0 +1,112 @@
+{%- style -%}
+  .cursor-section-{{ section.id }} {
+    position: relative;
+    background-color: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_v }}px 0;
+    overflow: hidden;
+    cursor: none;
+  }
+
+  .cursor-blob-{{ section.id }} {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.1) 40%, transparent 70%);
+    filter: blur(50px);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+  }
+
+  .cursor-section-content-{{ section.id }} {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+    text-align: center;
+  }
+{%- endstyle -%}
+
+<div class="cursor-section-{{ section.id }}" id="CursorSection-{{ section.id }}">
+  <div class="cursor-blob-{{ section.id }}" id="CursorBlob-{{ section.id }}"></div>
+  <div class="cursor-section-content-{{ section.id }}">
+    {{ section.blocks }}
+  </div>
+</div>
+
+<script>
+  (function () {
+    const section = document.getElementById('CursorSection-{{ section.id }}');
+    const blob = document.getElementById('CursorBlob-{{ section.id }}');
+    if (!section || !blob) return;
+
+    let raf;
+    let targetX = 0,
+      targetY = 0;
+    let currentX = 0,
+      currentY = 0;
+
+    section.addEventListener('mouseenter', () => {
+      blob.style.opacity = '1';
+    });
+
+    section.addEventListener('mouseleave', () => {
+      blob.style.opacity = '0';
+    });
+
+    section.addEventListener('mousemove', (e) => {
+      const rect = section.getBoundingClientRect();
+      targetX = e.clientX - rect.left;
+      targetY = e.clientY - rect.top;
+
+      if (!raf) animate();
+    });
+
+    function animate() {
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+
+      blob.style.left = currentX + 'px';
+      blob.style.top = currentY + 'px';
+
+      const dist = Math.abs(targetX - currentX) + Math.abs(targetY - currentY);
+      if (dist < 0.5) {
+        raf = null;
+      } else {
+        raf = requestAnimationFrame(animate);
+      }
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Cursor Glow Section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de Fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "padding_v",
+      "min": 0,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Vertical",
+      "default": 100
+    }
+  ],
+  "blocks": [],
+  "presets": [{ "name": "Cursor Glow Section" }]
+}
+{% endschema %}
