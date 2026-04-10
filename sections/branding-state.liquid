@@ -4,8 +4,8 @@
     padding: {{ section.settings.padding_v }}px 0;
     text-align: center;
     overflow: visible;
-    /* Perspectiva agresiva para el efecto 3D */
     perspective: 500px;
+    position: relative;
   }
 
   .brand-header-{{ section.id }} {
@@ -35,7 +35,6 @@
     margin-top: {{ section.settings.circle_margin_top }}px;
     padding: 150px 0;
     position: relative;
-    /* Necesario para movimiento en eje Z */
     transform-style: preserve-3d;
   }
 
@@ -48,12 +47,11 @@
     background-color: {{ section.settings.circle_bg_color }};
   }
 
-  /* IMAGEN CENTRAL 3D - SIN SOMBRAS */
+  /* IMAGEN CENTRAL 3D */
   .center-image-{{ section.id }} {
     position: absolute;
     top: 50%;
     left: 50%;
-    /* translateZ la saca del plano del círculo */
     transform: translate(-50%, -50%) translateZ(80px);
     width: {{ section.settings.inner_image_width }}%;
     z-index: 5;
@@ -67,7 +65,6 @@
     width: 100%;
     height: auto;
     display: block;
-    /* ELIMINADA LA SOMBRA PROYECTADA */
     filter: none !important;
   }
 
@@ -127,12 +124,30 @@
   .pos-8  .node-content-{{ section.id }} { right: {{ dist }}px; bottom: 0; transform: translateY(50%); }
   .pos-10 .node-content-{{ section.id }} { right: {{ dist }}px; top: 0; transform: translateY(-50%); }
 
+  /* --- CURSOR GLOW --- */
+  .cursor-glow-{{ section.id }} {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: left 0.08s ease-out, top 0.08s ease-out, opacity 0.3s ease;
+    z-index: 0;
+    opacity: 0;
+    filter: blur(30px);
+  }
+
   @media screen and (max-width: 768px) {
     .circle-wrapper-{{ section.id }} { transform: scale(0.65); padding: 40px 0; }
   }
 {%- endstyle -%}
 
 <div class="brand-statement-{{ section.id }}" id="Section-{{ section.id }}">
+  <!-- CURSOR GLOW -->
+  <div class="cursor-glow-{{ section.id }}" id="CursorGlow-{{ section.id }}"></div>
+
   <div class="container mx-auto px-6">
     <div
       class="brand-header-{{ section.id }}"
@@ -181,6 +196,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('Section-{{ section.id }}');
     const image = document.getElementById('Tilt-Image-{{ section.id }}');
+    const glow = document.getElementById('CursorGlow-{{ section.id }}');
     if (!container || !image) return;
 
     container.addEventListener('mousemove', (e) => {
@@ -188,21 +204,27 @@
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
+      // --- CURSOR GLOW ---
+      if (glow) {
+        glow.style.opacity = '1';
+        glow.style.left = x + 'px';
+        glow.style.top = y + 'px';
+      }
+
+      // --- TILT (lógica original sin cambios) ---
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-
-      // Aumentamos la potencia a 45 para que se incline MUCHO más
       const rotateX = ((y - centerY) / centerY) * -45;
       const rotateY = ((x - centerX) / centerX) * 45;
-
-      // Mantenemos los otros elementos quietos, solo transformamos "image"
-      // ELIMINADO EL FILTRO DE SOMBRA DINÁMICA
       image.style.transform = `translate(-50%, -50%) translateZ(100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.1)`;
     });
 
     container.addEventListener('mouseleave', () => {
+      // --- CURSOR GLOW ---
+      if (glow) glow.style.opacity = '0';
+
+      // --- TILT (lógica original sin cambios) ---
       image.style.transition = 'transform 0.5s ease-out';
-      // Volver a la posición central original
       image.style.transform = `translate(-50%, -50%) translateZ(80px) rotateX(0deg) rotateY(0deg) scale(1)`;
       setTimeout(() => {
         image.style.transition = 'transform 0.1s ease-out';
