@@ -143,11 +143,20 @@
         "node_content_width": 250,
         "node_icon_width": 50
       }
+    },
+    "prueba_hef46r": {
+      "type": "prueba",
+      "name": "Cursor Glow Section",
+      "settings": {
+        "bg_color": "#ffffff",
+        "padding_v": 400
+      }
     }
   },
   "order": [
     "hero_banner_q9jUBG",
     "separator_pKKz3L",
-    "branding_state_tfJfbD"
+    "branding_state_tfJfbD",
+    "prueba_hef46r"
   ]
 }
