@@ -127,7 +127,7 @@
   /* --- CURSOR GLOW --- */
   /* --- CURSOR GLOW --- */
   .cursor-glow-{{ section.id }} {
-    position: absolute;
+    position: fixed;
     width: 600px;
     height: 600px;
     border-radius: 50%;
@@ -209,8 +209,9 @@
       // --- CURSOR GLOW ---
       if (glow) {
         glow.style.opacity = '1';
-        glow.style.left = x + 'px';
-        glow.style.top = y + 'px';
+        // Usamos posición fija relativa a la ventana, no a la sección
+        glow.style.left = e.clientX + 'px';
+        glow.style.top = e.clientY + 'px';
       }
 
       // --- TILT (lógica original sin cambios) ---
