@@ -144,12 +144,66 @@
         "node_icon_width": 50
       }
     },
-    "prueba_hef46r": {
-      "type": "prueba",
-      "name": "Cursor Glow Section",
+    "custom_history_QHFgBR": {
+      "type": "custom-history",
+      "blocks": {
+        "node_bXxrh4": {
+          "type": "node",
+          "settings": {
+            "node_label": "MAL SUEÑO",
+            "horizontal_pos": 0,
+            "text_width": 150
+          }
+        },
+        "node_mCRMxY": {
+          "type": "node",
+          "settings": {
+            "node_label": "RONQUIDOS",
+            "horizontal_pos": 50,
+            "text_width": 150
+          }
+        },
+        "node_KgHmMk": {
+          "type": "node",
+          "settings": {
+            "node_label": "BOCA SECA",
+            "horizontal_pos": 100,
+            "text_width": 150
+          }
+        }
+      },
+      "block_order": [
+        "node_bXxrh4",
+        "node_mCRMxY",
+        "node_KgHmMk"
+      ],
+      "name": "Hero Ultra + Timeline",
       "settings": {
-        "bg_color": "#ffffff",
-        "padding_v": 400
+        "bg_image": "shopify://shop_images/fondo-azul.png",
+        "overlay_opacity": 0,
+        "hero_height": 80,
+        "content": "<p>FRASE PRINCIPAL</p>",
+        "text_color": "#ffffff",
+        "accent_color": "#ffffff",
+        "text_size": 40,
+        "font_family": "assistant_n4",
+        "font_weight": "700",
+        "text_transform": "none",
+        "line_height": 1.2,
+        "letter_spacing": 0,
+        "content_max_width": 800,
+        "gap_to_timeline": 80,
+        "timeline_max_width": 1000,
+        "line_color": "#ffffff",
+        "line_thickness": 2,
+        "node_color": "#ffffff",
+        "node_size": 20,
+        "node_text_color": "#ffffff",
+        "node_text_size": 14,
+        "node_text_gap": 20,
+        "vertical_alignment": "center",
+        "horizontal_alignment": "center",
+        "text_align": "center"
       }
     }
   },
@@ -157,6 +211,6 @@
     "hero_banner_q9jUBG",
     "separator_pKKz3L",
     "branding_state_tfJfbD",
-    "prueba_hef46r"
+    "custom_history_QHFgBR"
   ]
 }
