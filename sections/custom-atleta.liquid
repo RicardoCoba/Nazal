@@ -1,0 +1,475 @@
+{%- style -%}
+  .split-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_v }}px 0;
+  }
+
+  .split-container-{{ section.id }} {
+    max-width: {{ section.settings.container_width }}px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .main-grid-{{ section.id }} {
+    display: grid;
+    grid-template-columns: 4fr 6fr;
+    gap: 40px;
+  }
+
+  /* MEDIA IZQUIERDA (40%) */
+  .media-col-{{ section.id }} {
+    border-radius: {{ section.settings.media_radius }}px;
+    overflow: hidden;
+  }
+
+  .media-col-{{ section.id }} video,
+  .media-col-{{ section.id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* COLUMNA DERECHA (60%) */
+  .content-col-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    justify-content: {{ section.settings.col_vertical_alignment }};
+    align-items: {{ section.settings.col_horizontal_alignment }};
+    width: 100%;
+    /* GAP ENTRE BLOQUE TEXTO Y BLOQUE FOTOS */
+    gap: {{ section.settings.main_block_gap }}px;
+  }
+
+  /* BLOQUE 1: CONTENIDO AGRUPADO */
+  .group-content-{{ section.id }} {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: {{ section.settings.col_horizontal_alignment }};
+    /* GAP INTERNO ENTRE TÍTULO, IMG, BTN Y TEXTO */
+    gap: {{ section.settings.internal_element_gap }}px;
+  }
+
+  .split-title-{{ section.id }} {
+    color: {{ section.settings.title_color }};
+    font-size: {{ section.settings.title_size }}px;
+    font-family: {{ section.settings.font_family.family }}, sans-serif;
+    font-weight: {{ section.settings.font_weight }};
+    line-height: {{ section.settings.line_height }};
+    margin: 0;
+    text-transform: {{ section.settings.text_transform }};
+    text-align: {{ section.settings.text_align }};
+    width: 100%;
+  }
+
+  .new-inner-image-{{ section.id }} {
+    width: {{ section.settings.inner_img_width }}px;
+    height: auto;
+    border-radius: {{ section.settings.inner_img_radius }}px;
+    display: block;
+  }
+
+  .split-btn-{{ section.id }} {
+    display: inline-block;
+    padding: {{ section.settings.btn_padding_v }}px {{ section.settings.btn_padding_h }}px;
+    text-decoration: none;
+    background-color: {{ section.settings.btn_bg_color }};
+    color: {{ section.settings.btn_text_color }};
+    border: {{ section.settings.btn_border_width }}px solid {{ section.settings.btn_border_color }};
+    border-radius: {{ section.settings.btn_radius }}px;
+    font-size: {{ section.settings.btn_font_size }}px;
+    font-weight: {{ section.settings.btn_font_weight }};
+    letter-spacing: {{ section.settings.btn_letter_spacing }}px;
+    text-transform: {{ section.settings.btn_transform }};
+    transition: 0.3s ease;
+    width: fit-content;
+    line-height: 1.2;
+  }
+
+  .split-text-{{ section.id }} {
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    line-height: 1.6;
+    max-width: {{ section.settings.text_max_width }}px;
+    text-align: {{ section.settings.body_text_align }};
+    width: 100%;
+  }
+
+  /* BLOQUE 2: FOTOS */
+  .images-group-{{ section.id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: {{ section.settings.image_gap }}px;
+    width: 100%;
+    max-width: {{ section.settings.photos_max_width }}px;
+  }
+
+  .images-group-{{ section.id }} img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: {{ section.settings.image_radius }}px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .main-grid-{{ section.id }} { grid-template-columns: 1fr; }
+    .content-col-{{ section.id }}, .group-content-{{ section.id }} { align-items: center !important; }
+    .split-text-{{ section.id }}, .split-title-{{ section.id }} { text-align: center !important; max-width: 100%; }
+  }
+{%- endstyle -%}
+
+<section class="split-section-{{ section.id }}">
+  <div class="split-container-{{ section.id }}">
+    <div class="main-grid-{{ section.id }}">
+      <div class="media-col-{{ section.id }}">
+        {%- if section.settings.video_url != blank -%}
+          {{ section.settings.video_url | video_tag: autoplay: true, loop: true, muted: true, controls: false }}
+        {%- elsif section.settings.fallback_image != blank -%}
+          <img src="{{ section.settings.fallback_image | image_url: width: 1200 }}" alt="Media">
+        {%- endif -%}
+      </div>
+
+      <div class="content-col-{{ section.id }}">
+        <div class="group-content-{{ section.id }}">
+          {%- if section.settings.title != blank -%}
+            <h2 class="split-title-{{ section.id }}">{{ section.settings.title | newline_to_br }}</h2>
+          {%- endif -%}
+
+          {%- if section.settings.inner_image != blank -%}
+            <img
+              src="{{ section.settings.inner_image | image_url: width: 600 }}"
+              class="new-inner-image-{{ section.id }}"
+              alt="Icon"
+            >
+          {%- endif -%}
+
+          {%- if section.settings.btn_label != blank -%}
+            <a href="{{ section.settings.btn_link }}" class="split-btn-{{ section.id }}">
+              {{ section.settings.btn_label }}
+            </a>
+          {%- endif -%}
+
+          {%- if section.settings.text != blank -%}
+            <div class="split-text-{{ section.id }}">{{ section.settings.text }}</div>
+          {%- endif -%}
+        </div>
+
+        <div class="images-group-{{ section.id }}">
+          {%- if section.settings.img_1 != blank -%}
+            <img src="{{ section.settings.img_1 | image_url: width: 800 }}">
+          {%- endif -%}
+          {%- if section.settings.img_2 != blank -%}
+            <img src="{{ section.settings.img_2 | image_url: width: 800 }}">
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Split Media Master Gaps",
+  "settings": [
+    { "type": "header", "content": "Layout General" },
+    { "type": "color", "id": "bg_color", "label": "Fondo Sección", "default": "#000000" },
+    {
+      "type": "range",
+      "id": "container_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Ancho Contenedor",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "padding_v",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Padding Vertical Sección",
+      "default": 80
+    },
+
+    { "type": "header", "content": "Control de Gaps (Espaciado)" },
+    {
+      "type": "range",
+      "id": "internal_element_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap entre Título/Img/Btn/Texto",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "main_block_gap",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap entre Texto y Fotos Finales",
+      "default": 50
+    },
+
+    { "type": "header", "content": "Alineación Columna 60%" },
+    {
+      "type": "select",
+      "id": "col_vertical_alignment",
+      "label": "Posición Vertical",
+      "options": [
+        { "value": "flex-start", "label": "Arriba" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "col_horizontal_alignment",
+      "label": "Posición Horizontal (Bloque)",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "flex-start"
+    },
+
+    { "type": "header", "content": "Media Izquierda (40%)" },
+    { "type": "video", "id": "video_url", "label": "Video" },
+    { "type": "image_picker", "id": "fallback_image", "label": "Imagen Principal" },
+    {
+      "type": "range",
+      "id": "media_radius",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Redondeado Media",
+      "default": 0
+    },
+
+    { "type": "header", "content": "1. Título" },
+    { "type": "textarea", "id": "title", "label": "Texto Título", "default": "TITULO" },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño Fuente",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Alineación Título",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    { "type": "color", "id": "title_color", "label": "Color", "default": "#ffffff" },
+    { "type": "font_picker", "id": "font_family", "label": "Fuente", "default": "assistant_n4" },
+    {
+      "type": "range",
+      "id": "line_height",
+      "min": 0.8,
+      "max": 2.0,
+      "step": 0.1,
+      "label": "Interlineado",
+      "default": 1.1
+    },
+
+    { "type": "header", "content": "2. Imagen Decorativa" },
+    { "type": "image_picker", "id": "inner_image", "label": "Imagen" },
+    {
+      "type": "range",
+      "id": "inner_img_width",
+      "min": 50,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "inner_img_radius",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Redondeado",
+      "default": 0
+    },
+
+    { "type": "header", "content": "3. Botón" },
+    { "type": "text", "id": "btn_label", "label": "Texto", "default": "COMPRAR" },
+    { "type": "url", "id": "btn_link", "label": "Enlace" },
+    {
+      "type": "range",
+      "id": "btn_padding_v",
+      "min": 5,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto (Padding V)",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_h",
+      "min": 10,
+      "max": 150,
+      "step": 2,
+      "unit": "px",
+      "label": "Largo (Padding H)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "btn_font_size",
+      "min": 10,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño Fuente",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "btn_font_weight",
+      "label": "Peso Fuente",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "btn_letter_spacing",
+      "min": 0,
+      "max": 15,
+      "step": 1,
+      "unit": "px",
+      "label": "Espaciado Letras",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "btn_transform",
+      "label": "Transformación",
+      "options": [
+        { "value": "none", "label": "Normal" },
+        { "value": "uppercase", "label": "Mayúsculas" }
+      ],
+      "default": "uppercase"
+    },
+    { "type": "color", "id": "btn_bg_color", "label": "Fondo", "default": "#ffffff" },
+    { "type": "color", "id": "btn_text_color", "label": "Texto", "default": "#000000" },
+    { "type": "color", "id": "btn_border_color", "label": "Color Borde", "default": "#ffffff" },
+    {
+      "type": "range",
+      "id": "btn_border_width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor Borde",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "btn_radius",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Redondeado",
+      "default": 0
+    },
+
+    { "type": "header", "content": "4. Cuerpo de Texto" },
+    { "type": "richtext", "id": "text", "label": "Descripción" },
+    {
+      "type": "range",
+      "id": "text_max_width",
+      "min": 200,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho Máximo",
+      "default": 500
+    },
+    {
+      "type": "select",
+      "id": "body_text_align",
+      "label": "Alineación",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    { "type": "color", "id": "text_color", "label": "Color", "default": "#cccccc" },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño Fuente",
+      "default": 16
+    },
+
+    { "type": "header", "content": "5. Fotos Finales" },
+    { "type": "image_picker", "id": "img_1", "label": "Foto 1" },
+    { "type": "image_picker", "id": "img_2", "label": "Foto 2" },
+    {
+      "type": "range",
+      "id": "image_gap",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Espacio entre ellas",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "photos_max_width",
+      "min": 200,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "label": "Ancho Máximo Grupo",
+      "default": 500
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Redondeado Fotos",
+      "default": 0
+    }
+  ],
+  "presets": [{ "name": "Split Media Master Gaps" }]
+}
+{% endschema %}

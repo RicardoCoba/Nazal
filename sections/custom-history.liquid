@@ -1,0 +1,360 @@
+{%- style -%}
+  .hero-bg-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    min-height: {{ section.settings.hero_height }}vh;
+    display: flex;
+    flex-direction: column;
+    align-items: {{ section.settings.horizontal_alignment }};
+    justify-content: {{ section.settings.vertical_alignment }};
+    padding: 80px 20px;
+    background-color: #000;
+    overflow: hidden;
+  }
+
+  .hero-bg-{{ section.id }} .bg-image {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  .hero-bg-{{ section.id }}::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0, {{ section.settings.overlay_opacity }});
+    z-index: 2;
+  }
+
+  .hero-content-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    max-width: {{ section.settings.content_max_width }}px;
+    width: 100%;
+    text-align: {{ section.settings.text_align }};
+    margin-bottom: {{ section.settings.gap_to_timeline }}px;
+  }
+
+  .hero-text-{{ section.id }}, .hero-text-{{ section.id }} p {
+    margin: 0;
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    font-family: {{ section.settings.font_family.family }}, sans-serif;
+    font-weight: {{ section.settings.font_weight }};
+    line-height: {{ section.settings.line_height }};
+    text-transform: {{ section.settings.text_transform }} !important;
+    letter-spacing: {{ section.settings.letter_spacing }}px;
+  }
+
+  .hero-text-{{ section.id }} em { font-style: italic; color: {{ section.settings.accent_color }}; }
+
+  /* --- LÍNEA DE TIEMPO --- */
+  .timeline-wrapper-{{ section.id }} {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: {{ section.settings.timeline_max_width }}px;
+    padding: 40px 0;
+  }
+
+  .timeline-line-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    height: {{ section.settings.line_thickness }}px;
+    background-color: {{ section.settings.line_color }};
+  }
+
+  .timeline-node-{{ section.id }} {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: {{ section.settings.node_size }}px;
+    height: {{ section.settings.node_size }}px;
+    background-color: {{ section.settings.node_color }};
+    border-radius: 50%;
+  }
+
+  .node-text-{{ section.id }} {
+    position: absolute;
+    top: calc(100% + {{ section.settings.node_text_gap }}px);
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: {{ section.settings.node_text_color }};
+    font-size: {{ section.settings.node_text_size }}px;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1.2;
+    pointer-events: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .hero-bg-{{ section.id }} { padding: 40px 10px; }
+    .hero-text-{{ section.id }} p { font-size: calc({{ section.settings.text_size }}px * 0.6); }
+    .timeline-line-{{ section.id }} { height: auto; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 80px; }
+    .timeline-node-{{ section.id }} { position: relative; top: 0; left: 50% !important; transform: translateX(-50%); }
+    .node-text-{{ section.id }} { width: 160px !important; }
+  }
+{%- endstyle -%}
+
+<section class="hero-bg-{{ section.id }}">
+  {%- if section.settings.bg_image != blank -%}
+    <img src="{{ section.settings.bg_image | image_url: width: 2400 }}" class="bg-image" alt="Background">
+  {%- endif -%}
+
+  <div class="hero-content-{{ section.id }}">
+    <div class="hero-text-{{ section.id }}">
+      {{ section.settings.content }}
+    </div>
+  </div>
+
+  <div class="timeline-wrapper-{{ section.id }}">
+    <div class="timeline-line-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <div
+          class="timeline-node-{{ section.id }}"
+          style="left: {{ block.settings.horizontal_pos }}%;"
+          {{ block.shopify_attributes }}
+        >
+          <div class="node-text-{{ section.id }}" style="width: {{ block.settings.text_width }}px;">
+            {{ block.settings.node_label | newline_to_br }}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero Ultra + Timeline",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "header", "content": "Imagen y Altura" },
+    { "type": "image_picker", "id": "bg_image", "label": "Imagen de Fondo" },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 0.9,
+      "step": 0.05,
+      "label": "Opacidad Oscurecedor",
+      "default": 0.4
+    },
+    {
+      "type": "range",
+      "id": "hero_height",
+      "min": 30,
+      "max": 120,
+      "step": 5,
+      "unit": "vh",
+      "label": "Altura Sección",
+      "default": 70
+    },
+    { "type": "header", "content": "Texto Principal" },
+    { "type": "richtext", "id": "content", "label": "Frase", "default": "<p>FRASE PRINCIPAL</p>" },
+    { "type": "color", "id": "text_color", "label": "Color", "default": "#ffffff" },
+    { "type": "color", "id": "accent_color", "label": "Color Cursivas", "default": "#ffffff" },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 10,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño",
+      "default": 40
+    },
+    { "type": "font_picker", "id": "font_family", "label": "Fuente", "default": "assistant_n4" },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Peso",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Mayúsculas",
+      "options": [
+        { "value": "none", "label": "Original" },
+        { "value": "uppercase", "label": "Todo Mayúsculas" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "line_height",
+      "min": 0.7,
+      "max": 2.0,
+      "step": 0.1,
+      "label": "Interlineado",
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": -2,
+      "max": 15,
+      "step": 1,
+      "unit": "px",
+      "label": "Espaciado Letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 300,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Ancho Máximo Texto",
+      "default": 800
+    },
+    { "type": "header", "content": "Línea de Historia" },
+    {
+      "type": "range",
+      "id": "gap_to_timeline",
+      "min": 20,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Espacio Texto -> Línea",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "timeline_max_width",
+      "min": 300,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Largo Línea",
+      "default": 1000
+    },
+    { "type": "color", "id": "line_color", "label": "Color Línea", "default": "#ffffff" },
+    {
+      "type": "range",
+      "id": "line_thickness",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor Línea",
+      "default": 2
+    },
+    { "type": "color", "id": "node_color", "label": "Color Puntos", "default": "#ffffff" },
+    {
+      "type": "range",
+      "id": "node_size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño Puntos",
+      "default": 20
+    },
+    { "type": "header", "content": "Texto de los Puntos" },
+    { "type": "color", "id": "node_text_color", "label": "Color", "default": "#ffffff" },
+    {
+      "type": "range",
+      "id": "node_text_size",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño Fuente",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "node_text_gap",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Distancia Punto -> Texto",
+      "default": 20
+    },
+    { "type": "header", "content": "Alineación" },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "V-Align",
+      "options": [
+        { "value": "flex-start", "label": "Arriba" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "H-Align",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Text-Align",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "node",
+      "name": "Punto de Historia",
+      "settings": [
+        { "type": "textarea", "id": "node_label", "label": "Texto", "default": "PASO" },
+        {
+          "type": "range",
+          "id": "horizontal_pos",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Posición en línea",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "text_width",
+          "min": 50,
+          "max": 300,
+          "step": 10,
+          "unit": "px",
+          "label": "Ancho Texto",
+          "default": 150
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Ultra + Timeline",
+      "blocks": [
+        { "type": "node", "settings": { "horizontal_pos": 10, "node_label": "MAL SUEÑO" } },
+        { "type": "node", "settings": { "horizontal_pos": 50, "node_label": "RONQUIDOS" } },
+        { "type": "node", "settings": { "horizontal_pos": 90, "node_label": "BOCA SECA" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
