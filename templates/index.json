@@ -144,6 +144,52 @@
         "node_icon_width": 50
       }
     },
+    "custom_atleta_WWVfXK": {
+      "type": "custom-atleta",
+      "name": "Split Media Master Gaps",
+      "settings": {
+        "bg_color": "#000000",
+        "container_width": 1200,
+        "padding_v": 80,
+        "internal_element_gap": 20,
+        "main_block_gap": 50,
+        "col_vertical_alignment": "center",
+        "col_horizontal_alignment": "flex-start",
+        "fallback_image": "shopify://shop_images/video-deportista.png",
+        "media_radius": 0,
+        "title": "TITULO",
+        "title_size": 40,
+        "text_align": "left",
+        "title_color": "#ffffff",
+        "font_family": "assistant_n4",
+        "line_height": 1.1,
+        "inner_img_width": 150,
+        "inner_img_radius": 0,
+        "btn_label": "COMPRAR",
+        "btn_link": "",
+        "btn_padding_v": 15,
+        "btn_padding_h": 40,
+        "btn_font_size": 14,
+        "btn_font_weight": "600",
+        "btn_letter_spacing": 1,
+        "btn_transform": "uppercase",
+        "btn_bg_color": "#ffffff",
+        "btn_text_color": "#000000",
+        "btn_border_color": "#ffffff",
+        "btn_border_width": 1,
+        "btn_radius": 0,
+        "text": "",
+        "text_max_width": 500,
+        "body_text_align": "left",
+        "text_color": "#cccccc",
+        "text_size": 16,
+        "img_1": "shopify://shop_images/imagen-1.png",
+        "img_2": "shopify://shop_images/imagen-2.png",
+        "image_gap": 40,
+        "photos_max_width": 1000,
+        "image_radius": 0
+      }
+    },
     "custom_history_QHFgBR": {
       "type": "custom-history",
       "blocks": {
@@ -211,6 +257,7 @@
     "hero_banner_q9jUBG",
     "separator_pKKz3L",
     "branding_state_tfJfbD",
+    "custom_atleta_WWVfXK",
     "custom_history_QHFgBR"
   ]
 }
